@@ -25,7 +25,7 @@
                 <case-image :src="student.photo" :alt="student.name + '学员照片'" kind="portrait" label="学员照片待补充"></case-image>
                 <div class="student-card-copy">
                     <h3>{{ student.name }}</h3>
-                    <ul class="student-offer-lines"><li v-for="offer in student.offers" :key="offer.id"><strong>{{ offer.school || '录取院校待补充' }}</strong><span> · {{ offer.program || '录取专业待补充' }}</span></li></ul>
+                    <ul class="student-offer-lines"><li v-for="offer in student.offers" :key="offer.id"><strong>{{ offer.school || '录取院校待补充' }}</strong><span> · {{ offer.programZh || offer.program || '录取专业待补充' }}</span></li></ul>
                     <span class="student-detail-link">查看详情 <span aria-hidden="true">→</span></span>
                 </div>
             </a>

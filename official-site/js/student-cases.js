@@ -2,7 +2,7 @@
     "use strict";
 
     // 截图中的三位学员仅用于本轮前端样例；照片、offer 原图、作品归属待补充。
-    // 全量学员只维护此处；精选引用学员 ID，科系从学员作品按 system/major 派生。
+    // 全量学员只维护此处；精选引用学员 ID，科系按 system 引用作品；major 仅保存独立专业分类，不筛选作品。
     // 申请季使用确认的前端演示值，正式资料后续替换。
     const demoTerm = "2027-AUTUMN";
     const categories = [
@@ -15,9 +15,9 @@
         {
             id: "student-l", name: "L 同学", photo: "", categories: ["offer"], status: "published", isDemo: true,
             offers: [
-                {id: "l-chelsea", school: "伦敦艺术大学 切尔西学院", program: "面料设计", degree: "MA", image: "", term: demoTerm},
-                {id: "l-rca", school: "皇家艺术学院", program: "纺织品设计", degree: "MA", image: "", term: demoTerm},
-                {id: "l-kingston", school: "金斯顿大学", program: "时装设计", degree: "MA", image: "", term: demoTerm}
+                {id: "l-chelsea", school: "伦敦艺术大学 切尔西学院", program: "面料设计", programZh: "面料设计", programEn: "Fabric Design", degree: "MA", image: "", term: demoTerm},
+                {id: "l-rca", school: "皇家艺术学院", program: "纺织品设计", programZh: "纺织品设计", programEn: "Textile Design", degree: "MA", image: "", term: demoTerm},
+                {id: "l-kingston", school: "金斯顿大学", program: "时装设计", programZh: "时装设计", programEn: "Fashion Design", degree: "MA", image: "", term: demoTerm}
             ],
             // 无真实项目图时保留占位。每位学员全页面最多展示三张作品。
             works: [
@@ -29,9 +29,9 @@
         {
             id: "student-z", name: "Z 同学", photo: "", categories: ["offer"], status: "published", isDemo: true,
             offers: [
-                {id: "z-rca", school: "皇家艺术学院", program: "设计交互", degree: "MA", image: "", term: demoTerm},
-                {id: "z-ual", school: "伦敦艺术大学", program: "交互设计", degree: "MA", image: "", term: demoTerm},
-                {id: "z-edinburgh", school: "爱丁堡大学", program: "设计信息学", degree: "MSc", image: "", term: demoTerm}
+                {id: "z-rca", school: "皇家艺术学院", program: "设计交互", programZh: "设计交互", programEn: "Design Interactions", degree: "MA", image: "", term: demoTerm},
+                {id: "z-ual", school: "伦敦艺术大学", program: "交互设计", programZh: "交互设计", programEn: "Interaction Design", degree: "MA", image: "", term: demoTerm},
+                {id: "z-edinburgh", school: "爱丁堡大学", program: "设计信息学", programZh: "设计信息学", programEn: "Design Informatics", degree: "MSc", image: "", term: demoTerm}
             ],
             works: [
                 {id: "z-work-1", image: "", caption: "项目作品 01", system: "industrial", major: "交互设计", offerId: "z-rca"},
@@ -41,9 +41,9 @@
         {
             id: "student-g", name: "G 同学", photo: "", categories: ["offer"], status: "published", isDemo: true,
             offers: [
-                {id: "g-westminster", school: "威斯敏斯特大学", program: "纪录片", degree: "MA", image: "", term: demoTerm},
-                {id: "g-lfs", school: "伦敦电影学院", program: "纪录片", degree: "MA", image: "", term: demoTerm},
-                {id: "g-bournemouth", school: "伯恩茅斯大学", program: "影视制作", degree: "MFA", image: "", term: demoTerm}
+                {id: "g-westminster", school: "威斯敏斯特大学", program: "纪录片", programZh: "纪录片", programEn: "Documentary", degree: "MA", image: "", term: demoTerm},
+                {id: "g-lfs", school: "伦敦电影学院", program: "纪录片", programZh: "纪录片", programEn: "Documentary", degree: "MA", image: "", term: demoTerm},
+                {id: "g-bournemouth", school: "伯恩茅斯大学", program: "影视制作", programZh: "影视制作", programEn: "Film and Television Production", degree: "MFA", image: "", term: demoTerm}
             ],
             works: [
                 {id: "g-work-1", image: "", caption: "项目作品 01", system: "film", major: "媒体制作", offerId: "g-westminster"}
@@ -106,6 +106,7 @@
         const seen = new Set();
         return (offers || []).flatMap(offer => {
             if (!offer) return [];
+            offer = {...offer, program: offer.programZh || offer.program};
             const record = Object.fromEntries(["school", "program", "degree"].map(field => [field, String(offer[field] || "").trim().replace(/\s+/g, " ")]));
             const key = JSON.stringify([record.school, record.program, record.degree]);
             if (!record.school || seen.has(key)) return [];

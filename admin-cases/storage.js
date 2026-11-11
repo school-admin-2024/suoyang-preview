@@ -29,6 +29,8 @@
             assignedNumbers.add(row.studentNo);
             const demoTime = row.updatedAt || '2026-10-' + String(20 + index % 9).padStart(2, '0') + ' 10:00:00';
             row.createdAt ||= demoTime.length === 16 ? demoTime + ':00' : demoTime;
+            row.offers.forEach(window.OfferPrograms.normalizeOffer);
+            row.works.forEach(work => {work.major = typeof work.major === 'string' ? work.major : '';});
         });
         // Legacy prototype records use fixed demo dates; existing operation times are preserved.
         db.categories.forEach(category => {if(category.id === 'btech') category.name = 'BTEC国际课程案例';});

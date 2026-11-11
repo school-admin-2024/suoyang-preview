@@ -13,6 +13,7 @@
 .required-mark{color:#f56c6c;font-weight:400}
 .field-error{margin-top:1px;color:#f56c6c;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
 .field{min-width:0}.field input,.field select{min-width:0;max-width:100%}
+.field .program-readonly{background:#f5f7fa;color:#606266;cursor:default}
 .form-card>.field-error{margin-top:8px}
 .field input[aria-invalid=true]:not([type=file]),.field select[aria-invalid=true],.work-offer-options[aria-invalid=true],.upload-target:has(input[aria-invalid=true]){border-color:#f56c6c}
 .field input[aria-invalid=true]:focus,.field select[aria-invalid=true]:focus{outline-color:#f56c6c}

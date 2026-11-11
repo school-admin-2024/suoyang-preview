@@ -17,6 +17,7 @@ Vue.createApp({
             returnLabel = "科系学员案例";
             const query = new URLSearchParams({system});
             if (params.get("work")) query.set("work", params.get("work"));
+            if (params.get("workMajor")) query.set("workMajor", params.get("workMajor"));
             returnHref = "./systems-detail.html?" + query.toString() + "#works";
         }
         return {...SiteCommon.data(), student, returnHref, returnLabel, lightboxSrc: "", lightboxCaption: "", lightboxError: false};

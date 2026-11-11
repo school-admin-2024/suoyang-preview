@@ -56,15 +56,15 @@
             </div>
             <h2 v-if="student.offers.length" class="student-admissions-title">录取院校：</h2>
             <ul v-if="student.offers.length" class="student-admissions" aria-label="录取院校的录取院校及专业">
-              <li v-for="offer in student.offers" :key="offer.id"><strong>{{ offer.school || '录取院校待补充' }}</strong><span>{{ offer.program || '录取专业待补充' }}<template v-if="offer.degree"> · {{ offer.degree }}</template></span></li>
+              <li v-for="offer in student.offers" :key="offer.id"><strong>{{ offer.school || '录取院校待补充' }}</strong><span>{{ offer.programZh || offer.program || '录取专业待补充' }}<template v-if="offer.degree"> · {{ offer.degree }}</template></span></li>
             </ul>
           </div>
           <div class="student-offers" aria-label="录取 Offer">
             <div v-if="student.offers.length" class="student-offer-grid">
               <article v-for="offer in student.offers" :key="offer.id" class="offer-card">
                 <header class="offer-card-head"><div class="offer-card-meta"><span class="offer-wordmark"><b>SUOYANG</b><small>所样国际艺术中心</small></span><span v-if="formatOfferSeason(offer.term)" class="offer-term">{{ formatOfferSeason(offer.term) }}</span></div><strong class="offer-school">{{ offer.school || '录取院校待补充' }}</strong></header>
-                <div class="offer-program"><h3>{{ offer.program || '录取专业待补充' }}</h3><span v-if="offer.degree" class="offer-degree">{{ offer.degree }}</span></div>
-                <component :is="offer.image ? 'button' : 'div'" :type="offer.image ? 'button' : null" class="offer-media" :aria-label="offer.image ? '放大查看' + offer.school + '录取通知' : null" @click="openMedia(offer.image, offer.school + ' · ' + offer.program)">
+                <div class="offer-program"><h3>{{ offer.programZh || offer.program || '录取专业待补充' }}</h3><span v-if="offer.degree" class="offer-degree">{{ offer.degree }}</span></div>
+                <component :is="offer.image ? 'button' : 'div'" :type="offer.image ? 'button' : null" class="offer-media" :aria-label="offer.image ? '放大查看' + offer.school + '录取通知' : null" @click="openMedia(offer.image, offer.school + ' · ' + (offer.programZh || offer.program))">
                   <case-image :src="offer.image" :alt="offer.school + '录取通知'" kind="offer" label="Offer 图片待补充"></case-image>
                 </component>
               </article>

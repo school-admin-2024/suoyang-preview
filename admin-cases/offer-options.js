@@ -37,3 +37,47 @@ window.ADMIN_OFFER_OPTIONS = {
         {label:'艺术管理与教育',programs:['艺术管理','文化创意产业管理','博物馆研究','艺术教育','设计管理','艺术与科技']}
     ]
 };
+
+// Bilingual prototype directory. Replace these records with the external directory
+// adapter when its API is supplied; never translate a free-text entry at runtime.
+(function () {
+    const bilingual = [
+        ['视觉传达设计','Visual Communication Design'],['视觉传达','Visual Communication'],['平面设计','Graphic Design'],['品牌设计','Brand Design'],['插画','Illustration'],['摄影','Photography'],['商业摄影','Commercial Photography'],['信息设计','Information Design'],['字体设计','Typography'],['出版设计','Publication Design'],['广告设计','Advertising Design'],
+        ['交互设计','Interaction Design'],['设计交互','Design Interactions'],['用户体验设计','User Experience Design'],['用户界面设计','User Interface Design'],['数字媒体艺术','Digital Media Art'],['数字媒体设计','Digital Media Design'],['新媒体艺术','New Media Art'],['设计信息学','Design Informatics'],['创意计算','Creative Computing'],['创意技术','Creative Technology'],['服务设计','Service Design'],['设计创新','Design Innovation'],
+        ['产品设计','Product Design'],['工业设计','Industrial Design'],['家具设计','Furniture Design'],['交通工具设计','Transportation Design'],['汽车设计','Automotive Design'],['玩具设计','Toy Design'],['可持续设计','Sustainable Design'],['设计工程','Design Engineering'],
+        ['时装设计','Fashion Design'],['服装设计','Apparel Design'],['服装与服饰设计','Fashion and Apparel Design'],['纺织品设计','Textile Design'],['面料设计','Fabric Design'],['针织设计','Knitwear Design'],['时尚传播','Fashion Communication'],['时尚摄影','Fashion Photography'],['时尚管理','Fashion Management'],['奢侈品管理','Luxury Management'],['珠宝设计','Jewellery Design'],['配饰设计','Accessory Design'],['鞋履设计','Footwear Design'],
+        ['建筑设计','Architectural Design'],['建筑学','Architecture'],['室内设计','Interior Design'],['室内建筑','Interior Architecture'],['景观设计','Landscape Design'],['景观建筑','Landscape Architecture'],['城市设计','Urban Design'],['城市规划','Urban Planning'],['空间设计','Spatial Design'],['展览设计','Exhibition Design'],['舞台设计','Stage Design'],
+        ['纯艺术','Fine Art'],['绘画','Painting'],['油画','Oil Painting'],['版画','Printmaking'],['雕塑','Sculpture'],['陶瓷艺术','Ceramic Art'],['玻璃艺术','Glass Art'],['综合材料艺术','Mixed Media Art'],['艺术实践','Art Practice'],['公共艺术','Public Art'],['艺术史','Art History'],['策展研究','Curatorial Studies'],
+        ['动画','Animation'],['动画设计','Animation Design'],['二维动画','2D Animation'],['三维动画','3D Animation'],['游戏设计','Game Design'],['游戏艺术','Game Art'],['游戏开发','Game Development'],['概念艺术','Concept Art'],['角色设计','Character Design'],['视觉特效','Visual Effects'],
+        ['电影制作','Filmmaking'],['影视制作','Film and Television Production'],['电影导演','Film Directing'],['电影摄影','Cinematography'],['纪录片','Documentary'],['编剧','Screenwriting'],['影视剪辑','Film Editing'],['影视制片','Film Producing'],['影视声音设计','Sound Design for Film'],['电影研究','Film Studies'],
+        ['音乐表演','Music Performance'],['声乐','Vocal Performance'],['钢琴','Piano'],['弦乐表演','String Performance'],['管乐表演','Wind Performance'],['打击乐表演','Percussion Performance'],['作曲','Composition'],['音乐制作','Music Production'],['电子音乐','Electronic Music'],['音乐科技','Music Technology'],['影视配乐','Film Scoring'],['音乐教育','Music Education'],['音乐学','Musicology'],
+        ['戏剧表演','Acting'],['戏剧导演','Theatre Directing'],['音乐剧','Musical Theatre'],['舞蹈表演','Dance Performance'],['编舞','Choreography'],['戏剧研究','Theatre Studies'],['表演艺术','Performing Arts'],
+        ['艺术管理','Arts Management'],['文化创意产业管理','Cultural and Creative Industries Management'],['博物馆研究','Museum Studies'],['艺术教育','Art Education'],['设计管理','Design Management'],['艺术与科技','Art and Technology']
+    ];
+    const englishByChinese = new Map(bilingual);
+    const key = value => String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    const entries = window.ADMIN_OFFER_OPTIONS.programGroups.flatMap(group => group.programs.map(zh => {
+        const en = englishByChinese.get(zh);
+        if (!en) throw new Error('Missing bilingual directory record: ' + zh);
+        return Object.freeze({id:'program-' + en.toLowerCase().replace(/[^a-z0-9]+/g, '-'), en, zh, group:group.label});
+    }));
+    const byEnglish = new Map(entries.map(entry => [key(entry.en), entry]));
+    const byChinese = new Map(entries.map(entry => [entry.zh, entry]));
+    if (byEnglish.size !== entries.length) throw new Error('Duplicate English program directory entry');
+    function normalizeOffer(offer) {
+        // Migrate only old single-field records. Never overwrite an explicit pair
+        // (including an incomplete edit) with a guessed directory match.
+        if (offer.programEn === undefined && offer.programZh === undefined && offer.programId === undefined) {
+            const zh = String(offer.program || '').trim(), entry = byChinese.get(zh);
+            offer.programId = entry?.id || '';
+            offer.programEn = entry?.en || '';
+            offer.programZh = entry?.zh || zh;
+        }
+        offer.programId = String(offer.programId || '');
+        offer.programEn = String(offer.programEn || '');
+        offer.programZh = String(offer.programZh || '');
+        offer.program = offer.programZh;
+        return offer;
+    }
+    window.OfferPrograms = Object.freeze({entries:Object.freeze(entries),findEnglish:value=>byEnglish.get(key(value)),normalizeOffer});
+})();

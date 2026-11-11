@@ -370,11 +370,13 @@ button {
     justify-content: center;
 }
 
+.work-pills button:hover,
 .mentor-pills button:hover {
     color: var(--home-primary);
     border-color: var(--home-primary);
 }
 
+.work-pills button.is-active,
 .mentor-pills button.is-active {
     color: #fff;
     border-color: var(--home-primary);

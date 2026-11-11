@@ -445,7 +445,9 @@ Vue.createApp({
             qrLabel: "",
             consultMenuVisible: false,
             consultOptions: ["在线客服", "电话咨询", "预约1V1规划", "领取备考资料"],
-            activeMajor: 0
+            activeMajor: 0,
+            activeWorkMajor: system.majors.some(major => major.cn === params.get("workMajor")) ? params.get("workMajor") : "",
+            workFilterRevision: 0
         };
     },
     computed: {
@@ -458,7 +460,7 @@ Vue.createApp({
         workMajors() {
             return this.system.majors.map(major => major.cn);
         },
-        cases() {
+        allCases() {
             const linked = StudentCases.departmentWorks(this.systemKey);
             const demo = DEMO_WORK_ADMISSIONS[this.systemKey];
             const legacy = (this.system.cases || []).map((image, index) => ({
@@ -471,11 +473,27 @@ Vue.createApp({
                 return legacy.slice(0, 3).concat(linked, legacy.slice(3));
             }
             return linked.concat(legacy);
+        },
+        cases() {
+            return this.activeWorkMajor ? this.allCases.filter(work => work.major === this.activeWorkMajor) : this.allCases;
         }
     },
     methods: {
         selectMajor(index) {
             this.activeMajor = index;
+        },
+        async selectWorkMajor(major) {
+            if (major === this.activeWorkMajor || (major && !this.workMajors.includes(major))) return;
+            const revision = ++this.workFilterRevision;
+            if (this.workSwiper) {this.workSwiper.destroy(true, true);this.workSwiper = null;}
+            this.activeWorkMajor = major;
+            const url = new URL(window.location.href);
+            if (major) url.searchParams.set("workMajor", major); else url.searchParams.delete("workMajor");
+            url.searchParams.delete("work");
+            url.hash = "works";
+            history.replaceState(null, "", url);
+            await this.$nextTick();
+            if (revision === this.workFilterRevision && this.cases.length) this.initWorkSwiper();
         },
         workSchools(item) {
             return [...new Set(this.workAdmissions(item).map(offer => offer.school))];
@@ -490,7 +508,7 @@ Vue.createApp({
             }
         },
         workHref(item) {
-            return StudentCases.href(item.studentId, "system", {system: this.systemKey, work: item.id}) + "#" + item.id;
+            return StudentCases.href(item.studentId, "system", {system: this.systemKey, work: item.id, workMajor: this.activeWorkMajor}) + "#" + item.id;
         },
         openConsult(topic) {
             this.consultTopic = topic;

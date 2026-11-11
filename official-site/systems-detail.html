@@ -131,11 +131,11 @@
           <span class="section-kicker">STUDENT WORKS</span>
           <h2>{{ system.name }}优秀学员案例</h2>
         </div>
-        <div class="work-pills" role="list" :aria-label="system.name + '专业分类'">
-          <span class="work-major-label" role="listitem">全部</span>
-          <span v-for="major in workMajors" :key="'work-' + major" class="work-major-label" role="listitem">{{ major }}</span>
+        <div class="work-pills" role="group" :aria-label="system.name + '专业分类'">
+          <button type="button" class="work-major-label" :class="{'is-active':!activeWorkMajor}" :aria-pressed="!activeWorkMajor" @click="selectWorkMajor('')">全部</button>
+          <button v-for="major in workMajors" :key="'work-' + major" type="button" class="work-major-label" :class="{'is-active':activeWorkMajor===major}" :aria-pressed="activeWorkMajor===major" @click="selectWorkMajor(major)">{{ major }}</button>
         </div>
-        <div v-if="cases.length" class="work-carousel">
+        <div v-if="cases.length" :key="activeWorkMajor" class="work-carousel">
           <div class="swiper work-swiper">
             <div class="swiper-wrapper">
               <div v-for="item in cases" :key="item.id" class="swiper-slide">
@@ -159,7 +159,7 @@
           <button class="work-arrow next" type="button" aria-label="下一张">›</button>
           <div class="work-pagination"></div>
         </div>
-        <div v-else class="case-empty" role="status"><strong>学员案例待补充</strong></div>
+        <div v-else class="case-empty" role="status"><strong>当前分类暂无作品</strong></div>
       </section>
 
       <section id="consult" class="cta-section">

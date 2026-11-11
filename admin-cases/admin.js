@@ -47,7 +47,7 @@
             visibleDegrees(){return this.filteredDegrees.slice((this.degreePage-1)*10,this.degreePage*10);},
             applicationSeasons(){return window.OfferFields.seasons;},
             applicationYears(){const years=new Set();for(let year=2000;year<=new Date().getFullYear()+10;year++)years.add(String(year));for(const student of [...this.db.students,...(this.form?[this.form]:[])])for(const offer of student.offers){const year=this.applicationParts(offer.term).year;if(year)years.add(year);}return [...years].sort((a,b)=>Number(b)-Number(a));},
-            offerProgramGroups(){const groups=clone(window.ADMIN_OFFER_OPTIONS?.programGroups||[]),known=new Set(groups.flatMap(group=>group.programs));const extra=[];for(const student of [...window.ADMIN_CASES_SEED.students,...this.db.students])for(const offer of student.offers){const program=offer.program.trim();if(program&&!known.has(program)){extra.push(program);known.add(program);}}if(extra.length)groups.push({label:'已有案例专业',programs:extra});return groups;},
+            offerPrograms(){return window.OfferPrograms.entries;},
             previewTitle(){return this.preview?.type==='student'?'学员详情预览':this.preview?.type==='home'?'首页优秀学员预览':this.preview?.type==='department'?'科系案例预览':'分类案例页预览';}
             ,hasOverlay(){return !!(this.editor||this.smallForm||this.preview||this.confirmation||this.degreeManager);}
         },
@@ -70,7 +70,15 @@
                 if(enabled)apply();else this.ask('停用此学位？','停用后，新增和编辑学员的学位选项不再展示此项。已保存的案例内容保留，再次编辑保存时需选择启用中的学位。',apply,{label:'确认停用'});
             },
             offerField(offer,field){return 'offer-'+offer.id+'-'+field;},
-            newOffer(){return {id:id('offer'),school:'',program:'',degree:'',term:'-AUTUMN',image:''};},
+            newOffer(){return {id:id('offer'),school:'',programId:'',programEn:'',programZh:'',program:'',degree:'',term:'-AUTUMN',image:''};},
+            offerProgram(offer){return String(offer?.programZh||offer?.program||'');},
+            setOfferProgram(offer,value){
+                if(this.editorMode==='detail'||!this.guard())return;
+                const entry=window.OfferPrograms.findEnglish(value);
+                offer.programEn=value;offer.programId=entry?.id||'';offer.programZh=entry?.zh||'';offer.program=offer.programZh;
+            },
+            finishOfferProgram(offer){const entry=window.OfferPrograms.findEnglish(offer.programEn);if(entry&&this.editorMode!=='detail'&&this.canEdit)this.setOfferProgram(offer,entry.en);},
+            workCategories(work){return this.db.systems.find(system=>system.id===work.system)?.majors||[];},
             workField(work,field){return 'work-'+work.id+'-'+field;},
             studentFieldAttrs(field){return {'aria-invalid':this.studentErrors[field]?'true':undefined,'aria-describedby':this.studentErrors[field]?'student-error-'+field:undefined};},
             focusStudentError(){this.$nextTick(()=>{const error=document.querySelector('.drawer .field-error');if(!error)return;const field=error.closest('.field')||error.parentElement;field.scrollIntoView({block:'center',behavior:'smooth'});field.querySelector('input:not(:disabled),select:not(:disabled),button:not(:disabled)')?.focus({preventScroll:true});});},
@@ -165,13 +173,13 @@
             },
             viewStudent(student){this.openStudent(student,'detail');},
             editStudent(student){if(!this.guard())return;this.openStudent(student,'edit');},
-            openStudent(student,mode){this.studentSubmitted=false;this.editorMode=mode;this.form=student?clone(student):{id:'',name:'',photo:'',category:'',enabled:true,deletedAt:null,version:0,isDemo:false,offers:[this.newOffer()],works:[{id:id('work'),image:'',caption:'',system:'',offerIds:[]}]};if(mode!=='detail')this.form.offers.forEach(offer=>{const parts=this.applicationParts(offer.term);if(!parts.season&&(!offer.term||parts.year))offer.term=(parts.year||'')+'-AUTUMN';});const featured=this.isFeatured(student?.id),order=this.featuredRank(student?.id)||this.selectedPicks.length+1;Object.assign(this.form,{homeFeatured:featured,homeOrder:order,homeInitial:JSON.stringify({featured,order}),homeSnapshot:JSON.stringify(this.db.picks),departmentSnapshot:JSON.stringify(this.db.placements)});this.form.works.forEach(work=>{work.offerIds=offerIdsFor(work);const row=this.db.placements.find(item=>item.studentId===student?.id&&item.workId===work.id);work.displayEnabled=!!row?.enabled;work.displayOrder=row?this.placementOrder(row):this.nextPlacementOrder(work.system);});this.formInitial=JSON.stringify(this.form);this.formError='';this.editor=true;this.$nextTick(()=>this.editorMode==='detail'?document.querySelector('.drawer .close')?.focus():document.getElementById('student-name')?.focus());},
+            openStudent(student,mode){this.studentSubmitted=false;this.editorMode=mode;this.form=student?clone(student):{id:'',name:'',photo:'',category:'',enabled:true,deletedAt:null,version:0,isDemo:false,offers:[this.newOffer()],works:[{id:id('work'),image:'',caption:'',system:'',major:'',offerIds:[]}]};if(mode!=='detail')this.form.offers.forEach(offer=>{const parts=this.applicationParts(offer.term);if(!parts.season&&(!offer.term||parts.year))offer.term=(parts.year||'')+'-AUTUMN';});const featured=this.isFeatured(student?.id),order=this.featuredRank(student?.id)||this.selectedPicks.length+1;Object.assign(this.form,{homeFeatured:featured,homeOrder:order,homeInitial:JSON.stringify({featured,order}),homeSnapshot:JSON.stringify(this.db.picks),departmentSnapshot:JSON.stringify(this.db.placements)});this.form.works.forEach(work=>{work.major=work.major||'';work.offerIds=offerIdsFor(work);const row=this.db.placements.find(item=>item.studentId===student?.id&&item.workId===work.id);work.displayEnabled=!!row?.enabled;work.displayOrder=row?this.placementOrder(row):this.nextPlacementOrder(work.system);});this.formInitial=JSON.stringify(this.form);this.formError='';this.editor=true;this.$nextTick(()=>this.editorMode==='detail'?document.querySelector('.drawer .close')?.focus():document.getElementById('student-name')?.focus());},
             closeEditor(){if(this.saving){this.notify('正在保存，请稍候',true);return;}if(this.uploading){this.notify('图片正在读取，请稍候',true);return;}if(this.editorMode!=='detail'&&JSON.stringify(this.form)!==this.formInitial){this.ask('放弃未保存的修改？','关闭后，本次输入不会生效。',()=>{this.editor=false;this.form=null;},{danger:true,label:'放弃修改'});}else{this.editor=false;this.form=null;}},
             addOffer(){if(this.editorMode==='detail'||!this.guard())return;if(this.form.offers.length>=10){this.formError='每位学员最多 10 份 Offer';return;}this.form.offers.push(this.newOffer());this.formError='';},
             removeOffer(index){if(this.editorMode==='detail'||!this.guard())return;const offer=this.form.offers[index];if(this.form.offers.length<=1){this.formError='每位学员至少保留一份 Offer';return;}if(this.form.works.some(w=>offerIdsFor(w).includes(offer.id))){this.formError='这份 Offer 正被作品引用，请先取消作品中这份 Offer 的勾选，再移除。';return;}this.form.offers.splice(index,1);this.formError='';},
-            addWork(){if(this.editorMode==='detail'||!this.guard())return;if(this.form.works.length>=3){this.formError='每位学员最多 3 张作品';return;}this.form.works.push({id:id('work'),image:'',caption:'',system:'',offerIds:[],displayEnabled:false,displayOrder:1});},
-            workSystemChanged(work){work.displayOrder=this.nextPlacementOrder(work.system);this.formError='';},
-            toggleWorkDisplay(work){if(this.editorMode==='detail'||!this.guard())return;if(work.displayEnabled){this.ask('确认不在科系页面展示？','保存学员后，此作品将不再展示在科系页面。学员详情中的作品仍保留，已设置的关联科系、排序和对应 Offer 也会保留。',()=>{work.displayEnabled=false;this.formError='';},{label:'确认不展示'});}else{work.displayEnabled=true;this.formError='';}},
+            addWork(){if(this.editorMode==='detail'||!this.guard())return;if(this.form.works.length>=3){this.formError='每位学员最多 3 张作品';return;}this.form.works.push({id:id('work'),image:'',caption:'',system:'',major:'',offerIds:[],displayEnabled:false,displayOrder:1});},
+            workSystemChanged(work){work.major='';work.displayOrder=this.nextPlacementOrder(work.system);this.formError='';},
+            toggleWorkDisplay(work){if(this.editorMode==='detail'||!this.guard())return;if(work.displayEnabled){this.ask('确认不在科系页面展示？','保存学员后，此作品将不再展示在科系页面。学员详情中的作品仍保留，已设置的关联科系、专业分类、排序和对应 Offer 也会保留。',()=>{work.displayEnabled=false;this.formError='';},{label:'确认不展示'});}else{work.displayEnabled=true;this.formError='';}},
             removeWork(index){if(this.editorMode==='detail'||!this.guard())return;const work=this.form.works[index];if(this.form.works.length<=1){this.formError='每位学员至少保留一张作品';return;}if(work.displayEnabled){this.formError='请先将该作品的“科系展示”设为“否”，再移除作品。';return;}this.form.works.splice(index,1);this.formError='';},
             formMove(list,index,direction){if(this.editorMode==='detail'||!this.guard())return;const target=index+direction;if(target<0||target>=list.length)return;[list[index],list[target]]=[list[target],list[index]];},
             studentValidation(s){
@@ -186,8 +194,11 @@
                     const field=key=>this.offerField(offer,key),label='Offer '+(index+1)+'：';
                     if(!offer.school.trim())add(field('school'),'请选择录取院校',label);
                     else if(!this.offerSchoolGroups.some(group=>group.schools.includes(offer.school.trim())))add(field('school'),'请从院校选项中选择',label);
-                    if(!offer.program.trim())add(field('program'),'请选择录取专业',label);
-                    else if(!this.offerProgramGroups.some(group=>group.programs.includes(offer.program.trim())))add(field('program'),'请从专业选项中选择',label);
+                    const program=window.OfferPrograms.findEnglish(offer.programEn);
+                    if(!String(offer.programEn||'').trim())add(field('programEn'),'请选择录取专业英文名',label);
+                    else if(!program||program.id!==offer.programId)add(field('programEn'),'请从专业库中选择录取专业英文名',label);
+                    if(!String(offer.programZh||'').trim())add(field('programZh'),'请选择英文专业以带出中文名称',label);
+                    else if(!program||program.zh!==offer.programZh)add(field('programZh'),'专业中英文不匹配，请重新选择英文专业',label);
                     if(!offer.degree.trim())add(field('degree'),'请选择学位',label);
                     else if(!this.degreeAvailable(offer))add(field('degree'),'请重新选择启用中的学位',label);
                     if(!offer.term.trim())add(field('term'),'请选择申请季',label);
@@ -204,7 +215,7 @@
                     else if(offerIds.length>10)add(field('offerIds'),'最多关联 10 份 Offer',label);
                     else if(offerIds.some(offerId=>!s.offers.some(o=>o.id===offerId)))add(field('offerIds'),'作品只能引用当前学员的 Offer');
                     const placement=this.db.placements.find(row=>row.studentId===s.id&&row.workId===w.id),displayEnabled=w.displayEnabled??placement?.enabled;
-                    if(displayEnabled){if(!this.db.systems.some(system=>system.id===w.system))add(field('system'),'请选择关联科系',label);const order=w.displayOrder??(placement?this.placementOrder(placement):1);if(!Number.isSafeInteger(order)||order<1)add(field('displayOrder'),'展示排序须为正整数',label);}
+                    if(displayEnabled){if(!this.db.systems.some(system=>system.id===w.system))add(field('system'),'请选择关联科系',label);else if(w.major&&!this.workCategories(w).includes(w.major))add(field('major'),'请重新选择当前科系的专业分类',label);const order=w.displayOrder??(placement?this.placementOrder(placement):1);if(!Number.isSafeInteger(order)||order<1)add(field('displayOrder'),'展示排序须为正整数',label);}
                 }
                 if(s.homeFeatured){
                     if(!this.isFeatured(s.id)&&!s.enabled)add('homeFeatured','请先启用学员，再设为首页精选');
@@ -225,7 +236,7 @@
                 if(form.id&&(!original||original.deletedAt||original.version!==form.version)){this.formError='此学员已被其他操作修改，请保留输入并重新打开最新档案核对。';return;}
                 if(form.departmentSnapshot!==JSON.stringify(this.db.placements)){this.formError='科系展示已被其他操作修改，请重新打开档案核对。';return;}
                 const displays=form.works.map(work=>({workId:work.id,system:work.system,enabled:work.displayEnabled,order:work.displayOrder}));delete form.departmentSnapshot;form.works.forEach(work=>{work.offerIds=offerIdsFor(work);delete work.offerId;delete work.displayEnabled;delete work.displayOrder;});
-                form.name=form.name.trim();form.offers.forEach(o=>{o.school=o.school.trim();o.program=o.program.trim();o.degree=o.degree.trim();o.degreeId=this.enabledDegrees.find(row=>row.name===o.degree)?.id||'';o.term=this.applicationSeason(o.term);});form.id=form.id||id('student');form.version=(form.version||0)+1;form.updatedAt=stamp();form.createdAt=original?original.createdAt:form.updatedAt;form.studentNo=original?original.studentNo:Math.max(0,...this.db.students.map(student=>student.studentNo||0))+1;
+                form.name=form.name.trim();form.offers.forEach(o=>{o.school=o.school.trim();const program=window.OfferPrograms.findEnglish(o.programEn);Object.assign(o,{programId:program.id,programEn:program.en,programZh:program.zh,program:program.zh});o.degree=o.degree.trim();o.degreeId=this.enabledDegrees.find(row=>row.name===o.degree)?.id||'';o.term=this.applicationSeason(o.term);});form.id=form.id||id('student');form.version=(form.version||0)+1;form.updatedAt=stamp();form.createdAt=original?original.createdAt:form.updatedAt;form.studentNo=original?original.studentNo:Math.max(0,...this.db.students.map(student=>student.studentNo||0))+1;
                 const summary=original?`保存 ${form.name}；${original.name!==form.name?'展示名称变更；':''}分类 ${this.categoryName(original.category)} → ${this.categoryName(form.category)}；Offer ${original.offers.length} → ${form.offers.length}；作品 ${original.works.length} → ${form.works.length}；${form.enabled?'启用':'停用'}`:`新增 ${form.name} · ${this.categoryName(form.category)} · ${form.enabled?'启用':'停用'}`;
                 if(await this.commit(original?'修改学员':'新增学员',summary,db=>{const index=db.students.findIndex(s=>s.id===form.id);if(index<0)db.students.push(form);else db.students[index]=form;if(featuredChanged)this.writeFeatured(db,form.id,featured,rank);db.placements=db.placements.filter(row=>row.studentId!==form.id||displays.some(display=>display.workId===row.workId&&display.system));for(const display of displays){const row=db.placements.find(item=>item.studentId===form.id&&item.workId===display.workId);if(row)Object.assign(row,{enabled:display.enabled,order:display.order});else if(display.enabled)db.placements.push({id:id('placement'),studentId:form.id,workId:display.workId,enabled:true,order:display.order});}})){this.editor=false;this.form=null;this.notify('已保存，关联展示同步生效');}
             },
