@@ -351,7 +351,7 @@ button {
     margin-bottom: 34px;
 }
 
-.work-pills button,
+.work-pills .work-major-label,
 .mentor-pills button {
     min-width: 84px;
     height: 38px;
@@ -364,13 +364,17 @@ button {
     transition: 0.2s ease;
 }
 
-.work-pills button:hover,
+.work-pills .work-major-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .mentor-pills button:hover {
     color: var(--home-primary);
     border-color: var(--home-primary);
 }
 
-.work-pills button.is-active,
 .mentor-pills button.is-active {
     color: #fff;
     border-color: var(--home-primary);
@@ -1177,7 +1181,7 @@ button {
         margin-bottom: 24px;
     }
 
-    .work-pills button,
+    .work-pills .work-major-label,
     .mentor-pills button {
         min-width: 0;
         height: 33px;

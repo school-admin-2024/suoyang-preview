@@ -16,7 +16,6 @@ Vue.createApp({
         } else if (source === "system" && systems.includes(system)) {
             returnLabel = "科系学员案例";
             const query = new URLSearchParams({system});
-            if (params.get("major")) query.set("workMajor", params.get("major"));
             if (params.get("work")) query.set("work", params.get("work"));
             returnHref = "./systems-detail.html?" + query.toString() + "#works";
         }

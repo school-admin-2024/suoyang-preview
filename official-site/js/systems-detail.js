@@ -435,7 +435,6 @@ Vue.createApp({
         const params = new URLSearchParams(window.location.search);
         const key = params.get("system");
         const system = SYSTEMS[key] || SYSTEMS.fashion;
-        const requestedMajor = params.get("workMajor");
 
         return {
             system,
@@ -446,8 +445,7 @@ Vue.createApp({
             qrLabel: "",
             consultMenuVisible: false,
             consultOptions: ["在线客服", "电话咨询", "预约1V1规划", "领取备考资料"],
-            activeMajor: 0,
-            activeWorkTab: requestedMajor ? StudentCases.departmentMajors(SYSTEMS[key] ? key : "fashion").indexOf(requestedMajor) : -1
+            activeMajor: 0
         };
     },
     computed: {
@@ -458,19 +456,18 @@ Vue.createApp({
             return this.system.mentors || [];
         },
         workMajors() {
-            return StudentCases.departmentMajors(this.systemKey);
+            return this.system.majors.map(major => major.cn);
         },
         cases() {
-            const major = this.activeWorkTab >= 0 ? this.workMajors[this.activeWorkTab] : "";
-            const linked = StudentCases.departmentWorks(this.systemKey, major);
+            const linked = StudentCases.departmentWorks(this.systemKey);
             const demo = DEMO_WORK_ADMISSIONS[this.systemKey];
-            const legacy = this.activeWorkTab === -1 ? (this.system.cases || []).map((image, index) => ({
+            const legacy = (this.system.cases || []).map((image, index) => ({
                 id: this.systemKey + "-legacy-" + index, image,
                 studentName: demo.name,
                 admissions: StudentCases.admissionOffers(demo.offers.slice(0, this.systemKey === "fashion" && index === 1 ? demo.offers.length : [1, 2, 4][index % 3])),
                 isDemo: true
-            })) : [];
-            if (this.systemKey === "fashion" && this.activeWorkTab === -1) {
+            }));
+            if (this.systemKey === "fashion") {
                 return legacy.slice(0, 3).concat(linked, legacy.slice(3));
             }
             return linked.concat(legacy);
@@ -479,17 +476,6 @@ Vue.createApp({
     methods: {
         selectMajor(index) {
             this.activeMajor = index;
-        },
-        selectWorkTab(index) {
-            if (index < -1 || index >= this.workMajors.length) return;
-            if (this.workSwiper) { this.workSwiper.destroy(true, true); this.workSwiper = null; }
-            this.activeWorkTab = index;
-            const url = new URL(window.location.href);
-            if (index >= 0) url.searchParams.set("workMajor", this.workMajors[index]);
-            else url.searchParams.delete("workMajor");
-            url.searchParams.delete("work");
-            window.history.replaceState(null, "", url);
-            this.$nextTick(() => { if (this.cases.length) this.initWorkSwiper(); });
         },
         workSchools(item) {
             return [...new Set(this.workAdmissions(item).map(offer => offer.school))];
@@ -504,7 +490,7 @@ Vue.createApp({
             }
         },
         workHref(item) {
-            return StudentCases.href(item.studentId, "system", {system: this.systemKey, major: this.activeWorkTab >= 0 ? this.workMajors[this.activeWorkTab] : "", work: item.id}) + "#" + item.id;
+            return StudentCases.href(item.studentId, "system", {system: this.systemKey, work: item.id}) + "#" + item.id;
         },
         openConsult(topic) {
             this.consultTopic = topic;

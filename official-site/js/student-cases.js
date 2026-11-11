@@ -90,21 +90,17 @@
         const ids = Array.isArray(work.offerIds) ? work.offerIds : work.offerId ? [work.offerId] : [];
         return (student.offers || []).filter(offer => ids.includes(offer.id));
     }
-    function departmentWorks(system, major) {
+    function departmentWorks(system) {
         return published().flatMap(student => worksFor(student)
             .filter(work => work.system === system && work.displayEnabled !== false)
             .flatMap(work => {
                 const offers = workOffers(student, work);
-                const majors = [...new Set(offers.map(offer => String(offer.program || "").trim()).filter(Boolean))];
-                if (!offers.length || (major && !majors.includes(major))) return [];
+                if (!offers.length) return [];
                 return [{...work, studentId: student.id, studentName: student.name, isDemo: student.isDemo,
-                    majors, admissions: admissionOffers(offers),
+                    admissions: admissionOffers(offers),
                     schools: [...new Set(offers.map(offer => String(offer.school || "").trim()).filter(Boolean))],
                     offer: offers[0] || null}];
             }));
-    }
-    function departmentMajors(system) {
-        return [...new Set(departmentWorks(system).flatMap(work => work.majors))];
     }
     function admissionOffers(offers) {
         const seen = new Set();
@@ -122,5 +118,5 @@
         for (const [key, value] of Object.entries(options || {})) if (value) query.set(key, value);
         return "./student-detail.html?" + query.toString();
     }
-    window.StudentCases = {categories, students, admissionBoard, homePicks, published, getStudent, forCategory, worksFor, workOffers, departmentWorks, departmentMajors, admissionOffers, href};
+    window.StudentCases = {categories, students, admissionBoard, homePicks, published, getStudent, forCategory, worksFor, workOffers, departmentWorks, admissionOffers, href};
 })(window);

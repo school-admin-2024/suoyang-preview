@@ -14,15 +14,12 @@
         data() {
             // Field validation starts after the first save attempt, then follows live form values.
             const initial={db:fresh(),warning:''};
-            return {degreeManager:false,studentSubmitted:false,boardSubmitted:false,degreeSubmitted:false,degreeFilters:{keyword:'',status:''},appliedDegreeFilters:{keyword:'',status:''},degreePage:1,ready:false,storageReady:false,saving:false,legacyBrowser:false,legacySystem:"",legacyPage:1,db:initial.db,storageWarning:initial.warning,menu:menus,view:menus.some(m=>m.id===location.hash.slice(1))?location.hash.slice(1):'students',role:'admin',openTabIds:['students'],navOpen:false,menuKeyword:'',filters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},appliedFilters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},page:1,boardFilters:{keyword:'',status:''},appliedBoardFilters:{keyword:'',status:''},boardPage:1,department:'fashion',departmentMajor:'',editor:false,editorMode:'edit',form:null,formInitial:'',formError:'',uploading:0,smallForm:null,smallInitial:'',confirmation:null,preview:null,toast:null};
+            return {degreeManager:false,studentSubmitted:false,boardSubmitted:false,degreeSubmitted:false,degreeFilters:{keyword:'',status:''},appliedDegreeFilters:{keyword:'',status:''},degreePage:1,ready:false,storageReady:false,saving:false,db:initial.db,storageWarning:initial.warning,menu:menus,view:menus.some(m=>m.id===location.hash.slice(1))?location.hash.slice(1):'students',role:'admin',openTabIds:['students'],navOpen:false,menuKeyword:'',filters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},appliedFilters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},page:1,boardFilters:{keyword:'',status:''},appliedBoardFilters:{keyword:'',status:''},boardPage:1,department:'fashion',editor:false,editorMode:'edit',form:null,formInitial:'',formError:'',uploading:0,smallForm:null,smallInitial:'',confirmation:null,preview:null,toast:null};
         },
         computed:{
             studentErrors(){return this.editor&&this.editorMode!=='detail'&&this.studentSubmitted&&this.form?Object.fromEntries(this.studentValidation(this.form).map(error=>[error.field,error.message])):{};},
             boardErrors(){return this.smallForm?.type==='board'&&!this.smallForm.readOnly&&this.boardSubmitted?this.boardValidation(this.smallForm):{};},
             admissionsTitle(){return this.db.settings?.admissionsTitle||'录取院校：';},
-            filteredLegacy(){return (this.db.legacy||[]).filter(item=>!item.resolved&&(!this.legacySystem||item.system===this.legacySystem));},
-            legacyPages(){return Math.max(1,Math.ceil(this.filteredLegacy.length/10));},
-            visibleLegacy(){return this.filteredLegacy.slice((this.legacyPage-1)*10,this.legacyPage*10);},
             canEdit(){return this.ready&&this.storageReady&&!this.saving&&['admin','operator'].includes(this.role);},
             canDelete(){return this.ready&&this.storageReady&&!this.saving&&this.role==='admin';},
             pageName(){return this.menu.find(m=>m.id===this.view)?.name||'学员案例管理';},
@@ -35,7 +32,7 @@
             studentPages(){return Math.max(1,Math.ceil(this.filteredStudents.length/10));},
             visibleStudents(){return this.filteredStudents.slice((this.page-1)*10,this.page*10);},
             effectivePicks(){return this.db.picks.filter(this.isEffective);},
-            departmentRows(){return this.placementsForSystem(this.department).filter(row=>{const student=this.studentById(row.studentId);return student&&!student.deletedAt&&(!this.departmentMajor||this.offersForRow(row).some(offer=>offer.program===this.departmentMajor));});},
+            departmentRows(){return this.placementsForSystem(this.department).filter(row=>{const student=this.studentById(row.studentId);return student&&!student.deletedAt;});},
             sortedBoard(){return [...this.db.board].sort((a,b)=>this.boardValue(b)-this.boardValue(a));},
             filteredBoard(){const f=this.appliedBoardFilters,k=f.keyword.trim().toLowerCase();return this.sortedBoard.filter(b=>(!k||b.school.toLowerCase().includes(k))&&(!f.status||(f.status==='enabled')===b.enabled));},
             effectiveBoard(){return this.sortedBoard.filter(b=>b.enabled);},
@@ -52,7 +49,7 @@
             applicationYears(){const years=new Set();for(let year=2000;year<=new Date().getFullYear()+10;year++)years.add(String(year));for(const student of [...this.db.students,...(this.form?[this.form]:[])])for(const offer of student.offers){const year=this.applicationParts(offer.term).year;if(year)years.add(year);}return [...years].sort((a,b)=>Number(b)-Number(a));},
             offerProgramGroups(){const groups=clone(window.ADMIN_OFFER_OPTIONS?.programGroups||[]),known=new Set(groups.flatMap(group=>group.programs));const extra=[];for(const student of [...window.ADMIN_CASES_SEED.students,...this.db.students])for(const offer of student.offers){const program=offer.program.trim();if(program&&!known.has(program)){extra.push(program);known.add(program);}}if(extra.length)groups.push({label:'已有案例专业',programs:extra});return groups;},
             previewTitle(){return this.preview?.type==='student'?'学员详情预览':this.preview?.type==='home'?'首页优秀学员预览':this.preview?.type==='department'?'科系案例预览':'分类案例页预览';}
-            ,hasOverlay(){return !!(this.editor||this.smallForm||this.preview||this.confirmation||this.legacyBrowser||this.degreeManager);}
+            ,hasOverlay(){return !!(this.editor||this.smallForm||this.preview||this.confirmation||this.degreeManager);}
         },
         watch:{
             studentPages(value){if(this.page>value)this.page=value;},boardPages(value){if(this.boardPage>value)this.boardPage=value;},degreePages(value){if(this.degreePage>value)this.degreePage=value;},
@@ -230,7 +227,7 @@
                 const displays=form.works.map(work=>({workId:work.id,system:work.system,enabled:work.displayEnabled,order:work.displayOrder}));delete form.departmentSnapshot;form.works.forEach(work=>{work.offerIds=offerIdsFor(work);delete work.offerId;delete work.displayEnabled;delete work.displayOrder;});
                 form.name=form.name.trim();form.offers.forEach(o=>{o.school=o.school.trim();o.program=o.program.trim();o.degree=o.degree.trim();o.degreeId=this.enabledDegrees.find(row=>row.name===o.degree)?.id||'';o.term=this.applicationSeason(o.term);});form.id=form.id||id('student');form.version=(form.version||0)+1;form.updatedAt=stamp();form.createdAt=original?original.createdAt:form.updatedAt;form.studentNo=original?original.studentNo:Math.max(0,...this.db.students.map(student=>student.studentNo||0))+1;
                 const summary=original?`保存 ${form.name}；${original.name!==form.name?'展示名称变更；':''}分类 ${this.categoryName(original.category)} → ${this.categoryName(form.category)}；Offer ${original.offers.length} → ${form.offers.length}；作品 ${original.works.length} → ${form.works.length}；${form.enabled?'启用':'停用'}`:`新增 ${form.name} · ${this.categoryName(form.category)} · ${form.enabled?'启用':'停用'}`;
-                if(await this.commit(original?'修改学员':'新增学员',summary,db=>{const index=db.students.findIndex(s=>s.id===form.id);if(index<0)db.students.push(form);else db.students[index]=form;if(featuredChanged)this.writeFeatured(db,form.id,featured,rank);db.placements=db.placements.filter(row=>row.studentId!==form.id||displays.some(display=>display.workId===row.workId&&display.system));for(const display of displays){const row=db.placements.find(item=>item.studentId===form.id&&item.workId===display.workId);if(row)Object.assign(row,{enabled:display.enabled,order:display.order});else if(display.enabled)db.placements.push({id:id('placement'),studentId:form.id,workId:display.workId,enabled:true,order:display.order});}db.legacy.forEach(item=>{if(item.studentId===form.id&&!form.works.some(w=>w.id===item.workId)){item.resolved=false;delete item.studentId;delete item.workId;}});})){this.editor=false;this.form=null;this.notify('已保存，关联展示同步生效');}
+                if(await this.commit(original?'修改学员':'新增学员',summary,db=>{const index=db.students.findIndex(s=>s.id===form.id);if(index<0)db.students.push(form);else db.students[index]=form;if(featuredChanged)this.writeFeatured(db,form.id,featured,rank);db.placements=db.placements.filter(row=>row.studentId!==form.id||displays.some(display=>display.workId===row.workId&&display.system));for(const display of displays){const row=db.placements.find(item=>item.studentId===form.id&&item.workId===display.workId);if(row)Object.assign(row,{enabled:display.enabled,order:display.order});else if(display.enabled)db.placements.push({id:id('placement'),studentId:form.id,workId:display.workId,enabled:true,order:display.order});}})){this.editor=false;this.form=null;this.notify('已保存，关联展示同步生效');}
             },
             toggleStudent(s){if(!this.guard())return;const enabled=!s.enabled;if(enabled){const error=this.validateStudent({...clone(s),enabled:true});if(error){this.notify(error,true);return;}}
                 this.ask(enabled?'启用学员案例？':'停用学员案例？',enabled?'学员将恢复公开展示，已开启的首页和科系引用也会恢复。':'停用后，该学员在分类、详情、首页与科系展示中同步隐藏，资料与配置保留。',async()=>{if(await this.commit(enabled?'启用学员':'停用学员',s.name,db=>{const row=db.students.find(x=>x.id===s.id);row.enabled=enabled;row.version++;row.updatedAt=stamp();}))this.notify(enabled?'学员已启用':'学员已停用');},{impact:this.impactText(s.id),label:enabled?'确认启用':'确认停用'});
@@ -256,14 +253,6 @@
                 }catch{this.formError='图片读取失败，原图片已保留，请重新选择。';}finally{this.uploading--;event.target.value='';}
             },
             editTitle(){if(!this.guard())return;this.formError='';this.smallForm={type:'title',title:'录取信息标题设置',admissionsTitle:this.admissionsTitle};},
-            openLegacy(){this.legacyBrowser=true;this.legacyPage=1;this.legacySystem='';},
-            associateLegacy(legacy){
-                if(!this.guard())return;
-                const current=this.db.legacy.find(item=>item.id===legacy.id);
-                if(!current||current.resolved){this.notify('该历史案例已补录，请刷新列表',true);return;}
-                this.formError='';this.smallForm={type:'legacy',title:'历史案例补录',legacyId:current.id,studentId:'',offerIds:[],system:current.system||'',order:this.nextPlacementOrder(current.system)};
-            },
-            legacyStudentChanged(){this.smallForm.offerIds=[];this.formError='';},
             viewBoard(row){this.editBoard(row,true);},
             editBoard(row,readOnly=false){if(!readOnly&&!this.guard())return;this.formError='';this.boardSubmitted=false;this.smallForm={type:'board',readOnly,title:readOnly?'录取榜院校详情':row?'修改录取榜院校':'新增录取榜院校',id:row?.id||'',school:row?.school||'',metricType:row?this.boardType(row):'rate',rate:row?.rate??'',offerCount:row?.offerCount??'',enabled:row?.enabled??true};},
             closeSmallForm(){if(this.saving){this.notify('正在保存，请稍候',true);return;}if(this.smallForm&&JSON.stringify(this.smallForm)!==this.smallInitial){this.ask('放弃未保存的修改？','关闭后，本次配置输入不会生效。',()=>{this.smallForm=null;this.formError='';},{label:'放弃修改',danger:true});}else{this.smallForm=null;this.formError='';}},
@@ -287,23 +276,6 @@
                     if(!title||title.length>30){this.formError='请填写录取信息标题，最多 30 字';return;}
                     if(await this.commit('修改录取信息标题',title,db=>{db.settings={...db.settings,admissionsTitle:title};})){this.smallForm=null;this.notify('标题已保存');}return;
                 }
-                if(f.type==='legacy'){
-                    const legacy=this.db.legacy.find(item=>item.id===f.legacyId),student=this.studentById(f.studentId),ids=[...new Set(f.offerIds)];
-                    if(!legacy||legacy.resolved){this.formError='该历史案例已补录，请重新核对';return;}
-                    if(!student||student.deletedAt||!student.enabled){this.formError='请选择已启用学员';return;}
-                    if(student.works.length>=3){this.formError='该学员已有 3 张作品，请先整理作品后再补录';return;}
-                    if(!ids.length||ids.length>10||ids.some(id=>!student.offers.some(offer=>offer.id===id))){this.formError='请选择该学员的 1—10 份 Offer';return;}
-                    if(!this.db.systems.some(system=>system.id===f.system)){this.formError='请选择展示科系';return;}
-                    if(!Number.isSafeInteger(Number(f.order))||Number(f.order)<1){this.formError='展示排序须为正整数';return;}
-                    const work={id:id('work'),image:legacy.image,caption:'',system:f.system,offerIds:ids};
-                    const candidate=clone(student);candidate.works.push(work);const error=this.validateStudent(candidate);
-                    if(error){this.formError='请先完善学员资料：'+error;return;}
-                    if(await this.commit('历史案例补录',student.name+' · '+this.systemName(f.system),db=>{
-                        const target=db.students.find(item=>item.id===student.id);target.works.push(work);target.version++;target.updatedAt=stamp();
-                        const source=db.legacy.find(item=>item.id===legacy.id);Object.assign(source,{resolved:true,studentId:student.id,workId:work.id});
-                        db.placements.push({id:id('placement'),studentId:student.id,workId:work.id,enabled:true,order:Number(f.order)});
-                    })){this.smallForm=null;this.legacyPage=Math.min(this.legacyPage,this.legacyPages);this.notify('历史案例已补入学员作品');}return;
-                }
                 if(f.type==='board'){
                     this.boardSubmitted=true;
                     if(Object.keys(this.boardValidation(f)).length){this.$nextTick(()=>document.querySelector('.modal [aria-invalid="true"]')?.focus());return;}
@@ -320,7 +292,7 @@
             resetDemo(){if(!this.guard(true))return;this.ask('重置本地演示数据？','会清除本原型已保存的修改和上传图片，恢复初始样例。官网文件不受影响。',async()=>{if(await this.commit('重置演示数据','恢复初始样例',db=>{const revision=db.revision;Object.assign(db,fresh(),{revision});},{destructive:true,reset:true})){this.resetFilters();this.notify('已恢复演示数据');}},{danger:true,label:'重置演示数据'});},
             async syncStorage(){try{const latest=await window.AdminStorage.read();if(latest&&latest.revision>this.db.revision){this.db=latest;this.notify(this.editor||this.smallForm?'其他窗口已更新数据，当前表单保存时将检查版本冲突。':'其他窗口数据已同步');}}catch(error){this.storageWarning=window.AdminStorage.message(error);}},
             onStorage(event){if(event.key===window.AdminStorage.signalKey)this.syncStorage();},
-            onKey(event){if(event.key==='Escape'){if(this.confirmation)this.confirmation=null;else if(this.preview)this.preview=null;else if(this.smallForm)this.closeSmallForm();else if(this.editor)this.closeEditor();else if(this.degreeManager)this.degreeManager=false;else if(this.legacyBrowser)this.legacyBrowser=false;}if(event.key==='Tab'&&this.hasOverlay){const dialogs=[...document.querySelectorAll('[role="dialog"], [role="alertdialog"]')];const top=dialogs.at(-1);const focusable=top?[...top.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href]')].filter(el=>el.getClientRects().length):[];if(!focusable.length)return;const first=focusable[0],last=focusable.at(-1);if(!top.contains(document.activeElement)||(event.shiftKey&&document.activeElement===first)){event.preventDefault();(event.shiftKey?last:first).focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}},
+            onKey(event){if(event.key==='Escape'){if(this.confirmation)this.confirmation=null;else if(this.preview)this.preview=null;else if(this.smallForm)this.closeSmallForm();else if(this.editor)this.closeEditor();else if(this.degreeManager)this.degreeManager=false;}if(event.key==='Tab'&&this.hasOverlay){const dialogs=[...document.querySelectorAll('[role="dialog"], [role="alertdialog"]')];const top=dialogs.at(-1);const focusable=top?[...top.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href]')].filter(el=>el.getClientRects().length):[];if(!focusable.length)return;const first=focusable[0],last=focusable.at(-1);if(!top.contains(document.activeElement)||(event.shiftKey&&document.activeElement===first)){event.preventDefault();(event.shiftKey?last:first).focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}},
             onBeforeUnload(event){if(this.saving||(this.editor&&this.editorMode!=='detail'&&this.form&&JSON.stringify(this.form)!==this.formInitial)||(this.smallForm&&JSON.stringify(this.smallForm)!==this.smallInitial)){event.preventDefault();event.returnValue='';}}
         },
         mounted(){this.initialize();this.focusHandler=()=>{if(this.storageReady&&!this.saving)this.syncStorage();};window.addEventListener('focus',this.focusHandler);this.storageHandler=this.onStorage.bind(this);this.keyHandler=this.onKey.bind(this);this.unloadHandler=this.onBeforeUnload.bind(this);window.addEventListener('storage',this.storageHandler);window.addEventListener('keydown',this.keyHandler);window.addEventListener('beforeunload',this.unloadHandler);this.hashHandler=()=>{const name=location.hash.slice(1);this.view=this.menu.some(m=>m.id===name)?name:'students';if(!this.openTabIds.includes(this.view))this.openTabIds.push(this.view);if(name!==this.view)history.replaceState(null,'','#'+this.view);};this.hashHandler();window.addEventListener('hashchange',this.hashHandler);this.disabledObserver=new MutationObserver(()=>{document.querySelectorAll('button:disabled, fieldset:disabled button').forEach(button=>{if(!button.hasAttribute('data-disabled-title')){button.dataset.disabledTitle='';button.dataset.originalTitle=button.getAttribute('title')||'';}button.title=button.dataset.originalTitle||(!this.canEdit?'当前角色没有此操作权限':button.textContent.trim()==='删除'&&!this.canDelete?'仅管理员可删除学员':this.editorMode==='detail'&&button.closest('fieldset')?'查看模式不可修改':'当前条件下不可操作');});document.querySelectorAll('button[data-disabled-title]').forEach(button=>{if(!button.matches(':disabled')){if(button.dataset.originalTitle)button.title=button.dataset.originalTitle;else button.removeAttribute('title');delete button.dataset.disabledTitle;delete button.dataset.originalTitle;}});});this.disabledObserver.observe(document.getElementById('app'),{subtree:true,childList:true,attributes:true,attributeFilter:['disabled']});},

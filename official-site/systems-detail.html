@@ -130,13 +130,9 @@
         <div class="section-heading">
           <span class="section-kicker">STUDENT WORKS</span>
           <h2>{{ system.name }}优秀学员案例</h2>
-         <!-- <p>根据专业分类展示学员作品，点击切换查看</p>-->
         </div>
-        <div class="work-pills">
-          <button type="button" :class="{'is-active': activeWorkTab === -1}" @click="selectWorkTab(-1)">全部专业</button>
-          <button v-for="(major, index) in workMajors" :key="'work-' + major" type="button"
-                  :class="{ 'is-active': index === activeWorkTab }"
-                  @click="selectWorkTab(index)">{{ major }}</button>
+        <div class="work-pills" role="list" :aria-label="system.name + '专业分类'">
+          <span v-for="major in workMajors" :key="'work-' + major" class="work-major-label" role="listitem">{{ major }}</span>
         </div>
         <div v-if="cases.length" class="work-carousel">
           <div class="swiper work-swiper">
@@ -162,7 +158,7 @@
           <button class="work-arrow next" type="button" aria-label="下一张">›</button>
           <div class="work-pagination"></div>
         </div>
-        <div v-else class="case-empty" role="status"><strong>该专业学员案例待补充</strong><p>可切换“全部专业”查看现有作品。</p></div>
+        <div v-else class="case-empty" role="status"><strong>学员案例待补充</strong></div>
       </section>
 
       <section id="consult" class="cta-section">
