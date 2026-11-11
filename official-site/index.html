@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="所样艺术教育，为学生提供一站式艺术留学规划与作品集课程。">
+  <title>所样艺术教育｜艺术留学作品集培训</title>
+  <link rel="stylesheet" href="./css/common.css">
+  <link rel="stylesheet" href="./css/swiper.min.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <link rel="icon" href="./image/suoyang.ico">
+  <link rel="stylesheet" href="./css/phase2.css">
+  <link rel="stylesheet" href="./css/student-cases.css">
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="announcement" role="button" tabindex="0" aria-label="26申请季录取捷报持续更新，免费领取选校评估方案"
+         @click="openConsult('免费领取选校评估方案')" @keydown.enter.prevent="openConsult('免费领取选校评估方案')"
+         @keydown.space.prevent="openConsult('免费领取选校评估方案')">
+      <div class="page-width announcement-inner">
+        <span>26申请季录取捷报持续更新</span>
+        <span class="announcement-dot"></span>
+        <span>免费领取选校评估方案</span>
+      </div>
+    </div>
+
+    <header class="home-header">
+      <div class="page-width header-content">
+        <a class="home-logo" href="#top" aria-label="所样艺术教育首页">
+          <img src="./image/suoyang-international-art-center.png" alt="所样国际艺术中心">
+        </a>
+        <nav class="home-nav" aria-label="主导航">
+          <a href="#top" :class="{ 'is-active': activeNav === 'top' }" @click.prevent="scrollToSection('top')">首页</a>
+          <a href="#courses" :class="{ 'is-active': activeNav === 'courses' }" @click.prevent="scrollToSection('courses')">学术研究中心</a>
+          <a href="#system" :class="{ 'is-active': activeNav === 'system' }" @click.prevent="scrollToSection('system')">六大艺术科系</a>
+          <a href="#results" :class="{ 'is-active': activeNav === 'results' }" @click.prevent="scrollToSection('results')">部分录取成果展示</a>
+          <!--<a href="#about">师资团队</a>-->
+          <a href="#events" :class="{ 'is-active': activeNav === 'events' }" @click.prevent="scrollToSection('events')">课程活动</a>
+          <a href="./news.html">最新资讯</a>
+          <a href="#about" :class="{ 'is-active': activeNav === 'about' }" @click.prevent="scrollToSection('about')">关于所样</a>
+        </nav>
+        <div class="header-actions">
+          <button class="outline-button" type="button" @click="openConsult('课程咨询')">预约试听</button>
+          <button class="solid-button" type="button" @click="openConsult('留学规划')">免费留学评估</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero page-width">
+        <div class="swiper hero-swiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide hero-slide">
+              <video src="./image/banner.mp4" autoplay muted loop playsinline webkit-playsinline x5-playsinline
+                     x5-video-player-type="h5-page" x5-video-player-fullscreen="false"
+                     preload="auto" poster="./image/video1-cover.jpg"></video>
+            </div>
+            <div class="swiper-slide hero-slide">
+              <video src="./image/banner1.mp4" autoplay muted loop playsinline webkit-playsinline x5-playsinline
+                     x5-video-player-type="h5-page" x5-video-player-fullscreen="false"
+                     preload="auto" poster="./image/video2-cover.jpg"></video>
+            </div>
+          </div>
+        </div>
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <p class="hero-eyebrow">SUOYANG INTERNATIONAL ART EDUCATION</p>
+          <h1>一站式艺术&综合留学｜国际课程升学规划</h1>
+          <p>2000+名校导师｜万校录取Offer｜A-Level/BTEC官方认证教学中心</p>
+          <button type="button" @click="openConsult('定制方案')">立即定制方案</button>
+        </div>
+        <!-- <div class="hero-stats">
+          <div><strong>12+</strong><span>专注艺术教育</span></div>
+          <div><strong>80+</strong><span>海外合作院校</span></div>
+          <div><strong>98%</strong><span>名校录取率</span></div>
+        </div> -->
+        <div class="hero-pagination"></div>
+        <button class="hero-button-prev" type="button" aria-label="上一张"><span>‹</span></button>
+        <button class="hero-button-next" type="button" aria-label="下一张"><span>›</span></button>
+      </section>
+
+      <section id="elite-students" class="elite-section page-width" aria-labelledby="elite-title">
+        <div class="elite-heading">
+          <span class="section-kicker">OUR STUDENTS</span>
+          <div class="case-heading-line"><h2 id="elite-title">我们的学生</h2></div>
+          <p>所样学员超高名校录取率，冲刺TOP梦校成功案例展示</p>
+        </div>
+        <div class="admission-board" aria-label="所样梦校录取榜">
+          <div class="admission-board-title"><strong>所样梦校录取榜</strong></div>
+          <div class="admission-board-window" tabindex="0" role="region" aria-label="院校录取榜">
+            <ul class="admission-board-list">
+              <li v-for="school in admissionSchools" :key="school.school" class="admission-board-item">
+                <div class="admission-school-logo" :class="{'is-empty': !school.logo || failedSchoolLogos.includes(school.school)}">
+                  <img v-if="school.logo && !failedSchoolLogos.includes(school.school)" :src="school.logo" :alt="school.school + '校徽'" @error="markSchoolLogoFailed(school.school)">
+                  <svg v-else viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 19 24 9l16 10M12 21v17m8-17v17m8-17v17m8-17v17M7 39h34M8 20h32" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <span class="admission-school-name">{{ school.school }}</span>
+                <div class="admission-school-rate"><strong>{{ school.rate }}</strong><span>录取率</span></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div v-if="featuredStudents.length" class="elite-carousel" role="region" aria-label="我们的学生轮播" aria-roledescription="轮播">
+          <div class="swiper elite-swiper" @keydown.left.prevent="moveElite(-1)" @keydown.right.prevent="moveElite(1)">
+            <div class="swiper-wrapper">
+              <div v-for="student in featuredStudents" :key="student.id" class="swiper-slide" :data-featured-id="student.id">
+                <student-card :student="student" :href="studentHref(student.id, 'featured')"></student-card>
+              </div>
+            </div>
+          </div>
+          <button class="elite-arrow prev" type="button" aria-label="上一位学员" :disabled="featuredStudents.length < 2" @click="moveElite(-1)">‹</button>
+          <button class="elite-arrow next" type="button" aria-label="下一位学员" :disabled="featuredStudents.length < 2" @click="moveElite(1)">›</button>
+          <div class="elite-pagination" aria-label="选择学员">
+            <button v-for="(student, index) in featuredStudents" :key="student.id" type="button" class="elite-dot" :class="{'is-active': eliteIndex === index}" :aria-label="'查看' + student.name" :aria-current="eliteIndex === index ? 'true' : null" @click="selectElite(index)"></button>
+          </div>
+        </div>
+        <div v-else class="case-empty"><strong>学员案例待更新</strong><p>更多学员录取成果即将展示</p></div>
+      </section>
+
+      <section id="courses" class="section page-width">
+        <div class="section-heading">
+          <span class="section-kicker">COURSE SETTING</span>
+          <h2>学术研究中心</h2>
+          <p>覆盖艺术留学、alevel/Btec/AP国际课程、国际竞赛、国内研究生推免、少儿艺术全阶段升学需求</p>
+        </div>
+        <div class="course-grid">
+          <article v-for="(course, index) in courses" :key="course.title" class="course-card">
+            <a href="#consult" @click.prevent="openConsult(course.title)">
+              <div class="image-frame" :class="'crop-' + index % 6">
+                <img :src="course.image" :alt="course.title">
+              </div>
+              <div class="course-copy">
+                <h3>{{ course.title }} </h3>
+                <p>{{ course.description }}</p>
+              </div>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section id="system" class="section section-tint">
+        <div class="page-width">
+          <div class="section-heading">
+            <span class="section-kicker">SIX ART DEPARTMENTS</span>
+            <h2>六大艺术科系</h2>
+            <p>全覆盖海外艺术院校主流专业方向，量身打造专属作品集</p>
+          </div>
+          <div class="system-grid">
+            <a v-for="(item, index) in systems" :key="item.name" :href="'./systems-detail.html?system=' + item.slug" class="system-card">
+              <img :src="item.image" :alt="item.name" :class="'crop-' + index">
+              <span class="system-mask"></span>
+              <span class="system-icon">{{ item.icon }}</span>
+              <span class="system-text"><strong>{{ item.name }}</strong><small>{{ item.subtitle }}</small></span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section compact-section page-width">
+        <div class="section-heading">
+          <span class="section-kicker">POPULAR DESTINATIONS</span>
+          <h2>热门申请地区</h2>
+          <p>按需选择目标国家，查看专属申请攻略</p>
+        </div>
+        <div class="destination-list">
+          <button v-for="country in destinations" :key="country" type="button" @click="openConsult(country + '留学')">{{ country }}</button>
+        </div>
+      </section>
+
+      <section id="results" class="section section-tint">
+        <div class="page-width">
+          <div class="section-heading">
+            <span class="section-kicker">STUDENT OUTCOMES</span>
+            <h2>部分录取成果展示</h2>
+            <p>留学、保研、A-Level升学真实Offer案例可溯源查看</p>
+          </div>
+          <div class="result-grid">
+            <a v-for="(result, index) in results" :key="result.id" :href="'./student-list.html?category=' + result.id" class="overlay-card">
+              <img :src="result.image" :alt="result.title" :class="'crop-' + (index + 1)">
+              <span class="overlay-card-shade"></span>
+              <div><h3>{{ result.title }}</h3><p>{{ result.desc }}</p></div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section page-width">
+        <div class="section-heading">
+          <span class="section-kicker">WHY SUOYANG</span>
+          <h2>为什么选择我们</h2>
+        </div>
+        <div class="feature-grid">
+          <article v-for="(feature, index) in features" :key="feature.title" class="feature-card">
+            <div class="feature-image"><img :src="feature.image" :alt="feature.title" :class="'crop-' + (index + 2)"><!--<span>0{{ index + 1 }}</span>--></div>
+            <div class="feature-copy"><h3>{{ feature.title }}</h3><p>{{ feature.desc }}</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="process" class="section page-width process-section">
+        <div class="section-heading">
+          <span class="section-kicker">SERVICE PROCESS</span>
+          <h2>标准化升学服务流程</h2>
+          <p>免费咨询 → 背景测评定位 → 定制专属方案 → 课程授课/文书打磨 → 院校申请递交 → 面试辅导 → 签证入学衔接</p>
+        </div>
+        <div class="process-line">
+          <div v-for="(item, index) in process" :key="item" class="process-item">
+            <span>0{{ index + 1 }}</span>
+            <strong>{{ item }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-tint">
+        <div class="page-width">
+          <div class="section-heading">
+            <span class="section-kicker">REAL FEEDBACK</span>
+            <h2>学员真实反馈 & 全国校区</h2>
+          </div>
+          <div class="feedback-grid">
+            <a href="#consult" class="wide-card" @click.prevent="openConsult('学员案例')">
+              <img src="./image/real-%20feedback1.png" alt="学员真实反馈">
+              <span class="wide-shade"></span>
+              <div><h3>学员口碑评价+访谈视频</h3></div>
+            </a>
+            <a href="#consult" class="wide-card" @click.prevent="openConsult('校区参观')">
+              <img src="./image/real-%20feedback2.jpeg" alt="全国校区环境" class="crop-5">
+              <span class="wide-shade"></span>
+              <div><h3>全国线下校区分布实景</h3></div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="events" class="section page-width latest-section">
+        <div class="section-heading">
+          <span class="section-kicker">LATEST EVENTS</span>
+          <h2>最新升学资讯 &amp; 线上线下讲座</h2>
+        </div>
+        <div class="latest-grid">
+          <a v-for="(news, index) in newsList" :key="news.title"
+             :href="news.link || 'javascript:void(0)'"
+             :role="news.link ? null : 'button'"
+             :tabindex="news.link ? null : 0"
+             :aria-label="news.link ? null : news.title + '，查看各城市预约二维码'"
+             class="wide-card latest-card"
+             @click="onLatestCard(news, $event)"
+             @keydown.space.prevent="onLatestCard(news, $event)">
+            <img :src="news.image" :alt="news.title" :class="'crop-' + (index + 3)">
+            <span class="wide-shade"></span>
+            <div><h3>{{ news.title }}</h3></div>
+          </a>
+        </div>
+      </section>
+
+      <section id="consult" class="cta-section">
+        <span class="cta-decor" aria-hidden="true"></span>
+        <div class="page-width cta-content">
+          <span>YOUR DREAM · OUR MISSION</span>
+          <h2>领取1对1专属升学规划方案</h2>
+          <p>填写信息，资深顾问免费为你做背景评估、选校定位</p>
+          <div class="cta-dropdown">
+            <button type="button" :aria-expanded="consultMenuVisible" aria-haspopup="true" :class="{'is-open': consultMenuVisible}" @click="toggleConsultMenu">
+              立即预约评估
+              <b>▾</b>
+            </button>
+            <ul v-if="consultMenuVisible" class="cta-menu">
+              <li v-for="item in consultOptions" :key="item">
+                <button type="button" @click="selectConsultOption(item)">{{ item }}</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="about" class="home-footer">
+      <div class="page-width footer-main">
+        <div class="footer-column footer-intro">
+          <h3>关于我们</h3>
+          <p>所样国际艺术教育由一群来自世界顶尖艺术设计院校的设计师、讲师和艺术家于 2019 年在上海创立，是专注于多元化国际艺术服务的联合艺术聚集空间。</p>
+        </div>
+        <div class="footer-column footer-links">
+          <h3>业务导览</h3>
+          <p>艺术留学作品集 <br>
+            名校爬藤<br>
+            国际课程 A-LEVEL | BTEC | AP<br>
+            背景提升<br>
+            SO DO创意思维实验室<br>
+            国际奖项<br>
+            研究生预推免 <br>
+           </p>
+        </div>
+        <div class="footer-column footer-contact">
+          <h3>校区联系</h3>
+          <p>北京：400-879-0619</p>
+          <p>上海：021-60190648</p>
+        </div>
+        <div class="footer-column footer-social-column">
+          <h3>关注我们</h3>
+          <div class="footer-social-row">
+            <div class="footer-qr-list">
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')" @keydown.enter.prevent="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')" @keydown.space.prevent="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')"><img src="./image/shnghai-officialaccount.jpg" alt="公众号二维码"><span>公众号</span></div>
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shanghai-redbook.png', '小红书二维码')" @keydown.enter.prevent="openQr('./image/shanghai-redbook.png', '小红书二维码')" @keydown.space.prevent="openQr('./image/shanghai-redbook.png', '小红书二维码')"><img src="./image/shanghai-redbook.png" alt="小红书二维码"><span>小红书</span></div>
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shanghai-douyin.png', '抖音二维码')" @keydown.enter.prevent="openQr('./image/shanghai-douyin.png', '抖音二维码')" @keydown.space.prevent="openQr('./image/shanghai-douyin.png', '抖音二维码')"><img src="./image/shanghai-douyin.png" alt="抖音二维码"><span>抖音</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-width footer-bottom">
+        <span><a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer">苏ICP备12006634号-12</a> | 版权所有 ©所样国际艺术中心</span>
+      </div>
+    </footer>
+
+    <aside class="floating-contact" aria-label="快捷联系">
+      <button type="button" @click="openConsult('电话咨询')"><img class="floating-icon" src="./image/phone.png" alt="电话咨询">在线咨询</button>
+      <button type="button" aria-haspopup="dialog" @click="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')">
+        <svg class="floating-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.69 3.5c-3.7 0-6.69 2.5-6.69 5.57 0 1.77 1 3.35 2.55 4.38l-.64 1.93 2.24-1.12c.79.22 1.64.35 2.54.35.15 0 .3 0 .45-.01a5.06 5.06 0 0 1-.21-1.43c0-3.07 2.99-5.56 6.67-5.56.22 0 .44.01.66.03C15.42 5.05 12.3 3.5 8.69 3.5zM6.6 6.7a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zm4.2 0a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zm4.11 1.83c-3.31 0-6 2.29-6 5.11s2.69 5.11 6 5.11c.62 0 1.22-.08 1.79-.22l2.05 1.03-.55-1.66C19.75 17 21 15.5 21 13.64c0-2.82-2.78-5.11-6.09-5.11zm-2.06 2.6a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5zm4.1 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"/></svg>
+        公众号
+      </button>
+      <a href="#top"><span>↑</span>返回顶部</a>
+    </aside>
+
+    <div v-if="dialogVisible" class="dialog-backdrop" @click.self="dialogVisible = false">
+      <div class="consult-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+        <button class="dialog-close" type="button" aria-label="关闭" @click="dialogVisible = false">×</button>
+        <small>CONTACT US</small>
+        <h2 id="dialog-title">{{ consultTopic }}</h2>
+        <p>请选择所在城市，通过电话或微信联系我们。</p>
+        <div class="contact-city-list">
+          <article class="contact-city-card">
+            <div class="contact-city-copy">
+              <span>BEIJING</span>
+              <h3>北京</h3>
+              <a href="tel:4008790619">400-879-0619</a>
+              <p>微信扫码咨询</p>
+            </div>
+            <img src="./image/beijing-wechat.png" alt="北京微信二维码">
+          </article>
+          <article class="contact-city-card">
+            <div class="contact-city-copy">
+              <span>SHANGHAI</span>
+              <h3>上海</h3>
+              <a href="tel:02160190648">021-60190648</a>
+              <p>微信扫码咨询</p>
+            </div>
+            <img src="./image/shanghai-wechat.png" alt="上海微信二维码">
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="qrPreview" class="dialog-backdrop" @click.self="closeQr()">
+      <div class="qr-dialog" role="dialog" aria-modal="true" :aria-label="qrLabel">
+        <button class="dialog-close" type="button" aria-label="关闭" @click="closeQr()">×</button>
+        <img :src="qrPreview" :alt="qrLabel">
+        <p>{{ qrLabel }}</p>
+        <small>长按或扫码关注</small>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/vue.global.prod.js"></script>
+  <script src="./js/swiper.min.js"></script>
+  <script src="./js/student-cases.js"></script>
+  <script src="./js/offer-format.js"></script>
+  <script src="./js/student-ui.js"></script>
+  <script src="./js/index.js"></script>
+</body>
+</html>

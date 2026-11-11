@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="所样最新资讯：艺术留学作品集、国际课程、留学申请、低龄艺术、研究生推免与校区动态。">
+  <title>最新资讯｜所样艺术教育</title>
+  <link rel="stylesheet" href="./css/common.css">
+  <link rel="stylesheet" href="./css/swiper.min.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <link rel="stylesheet" href="./css/news.css">
+  <link rel="icon" href="./image/suoyang.ico">
+  <link rel="stylesheet" href="./css/phase2.css">
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="announcement" role="button" tabindex="0" aria-label="26申请季录取捷报持续更新，免费领取选校评估方案"
+         @click="openConsult('免费领取选校评估方案')" @keydown.enter.prevent="openConsult('免费领取选校评估方案')"
+         @keydown.space.prevent="openConsult('免费领取选校评估方案')">
+      <div class="page-width announcement-inner">
+        <span>26申请季录取捷报持续更新</span>
+        <span class="announcement-dot"></span>
+        <span>免费领取选校评估方案</span>
+      </div>
+    </div>
+
+    <header class="home-header">
+      <div class="page-width header-content">
+        <a class="home-logo" href="./index.html" aria-label="所样艺术教育首页">
+          <img src="./image/suoyang-international-art-center.png" alt="所样国际艺术中心">
+        </a>
+        <nav class="home-nav" aria-label="主导航">
+          <a href="./index.html">首页</a>
+          <a href="./index.html#courses">学术研究中心</a>
+          <a href="./index.html#system">六大艺术科系</a>
+          <a href="./index.html#results">部分录取成果展示</a>
+          <a href="./index.html#events">课程活动</a>
+          <a class="is-active" href="./news.html">最新资讯</a>
+          <a href="./index.html#about">关于所样</a>
+        </nav>
+        <div class="header-actions">
+          <button class="outline-button" type="button" @click="openConsult('课程咨询')">预约试听</button>
+          <button class="solid-button" type="button" @click="openConsult('留学规划')">免费留学评估</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+
+      <!-- ============ 资讯列表视图 ============ -->
+      <section v-if="!activeArticle" id="info" class="section page-width" aria-labelledby="info-title">
+        <div class="block-head" id="info-articles">
+          <h3><span>LATEST ARTICLES</span>最新资讯文章</h3>
+          <span class="head-count">共 {{ filtered.length }} 篇</span>
+        </div>
+
+        <div class="news-layout">
+          <div class="news-main">
+            <div class="filter-tabs" role="tablist">
+              <button v-for="tab in tabs" :key="tab.id" type="button"
+                      :class="{ 'is-active': activeCat === tab.id }"
+                      @click="selectCat(tab.id)">{{ tab.id === 'all' ? '全部' : tab.name + ' ' + tab.count }}</button>
+            </div>
+
+            <p v-if="!pagedArticles.length" class="article-empty">该分类下暂无内容，欢迎看看其他分类</p>
+
+            <div v-else class="article-grid">
+              <article v-for="a in pagedArticles" :key="a.id" class="article-card" role="link" tabindex="0"
+                       @click="openArticle(a.id)" @keydown.enter.prevent="openArticle(a.id)" @keydown.space.prevent="openArticle(a.id)">
+                <div class="article-cover">
+                  <img :src="coverDataUri(a.cover)" :alt="a.title">
+                  <span class="article-tag">{{ catName(a.category) }}</span>
+                </div>
+                <div class="article-body">
+                  <h4>{{ a.title }}</h4>
+                  <p>{{ a.summary }}</p>
+                  <div class="article-meta">
+                    <span class="date">{{ a.date }}</span>
+                    <span>{{ a.author }} · {{ a.read }} 阅读</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <nav v-if="totalPages > 1" class="pager" aria-label="文章分页">
+              <button type="button" :disabled="page === 1" aria-label="上一页" @click="goPage('prev')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <template v-for="(p, i) in pagerPages" :key="i">
+                <span v-if="p === '…'" class="pager-ellipsis">…</span>
+                <button v-else type="button" :class="{ 'is-active': p === page }" @click="goPage(p)">{{ p }}</button>
+              </template>
+              <button type="button" :disabled="page === totalPages" aria-label="下一页" @click="goPage('next')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            </nav>
+          </div>
+
+          <aside class="news-side">
+            <div class="side-card">
+              <div class="side-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2s1 2.5 1 4.5c0 1.5-.8 2.6-1.8 3.6C10 11.4 9 12.7 9 14.5A5 5 0 0 0 19 14c0-1.2-.4-2.2-1-3-.3 1-.9 1.8-1.8 2.2.3-2.6-.8-5.6-2.2-7.4C13.2 4.6 12 2 12 2z"/></svg>
+                <strong>热点 News</strong>
+                <small>阅读量 TOP 10</small>
+              </div>
+              <ol class="hot-rank">
+                <li v-for="a in hotArticles" :key="'hot-' + a.id">
+                  <a href="javascript:void(0)" :title="a.title" @click.prevent="openArticle(a.id)">
+                    <h5>{{ a.title }}</h5>
+                    <span class="hot-read">{{ a.read }} 阅读</span>
+                  </a>
+                </li>
+              </ol>
+            </div>
+          </aside>
+        </div>
+
+        <div class="block-head faq-block-head" style="margin-top:60px;">
+          <h3><span>SUOYANG FAQ</span>所样 FAQ</h3>
+          <div class="head-tools faq-head-tools">
+            <div class="faq-search" :class="{ 'is-active': faqQuery || faqKeyword }">
+              <input type="text" v-model="faqQuery" placeholder="搜索问题，如：作品集 / 费用 / 申请" aria-label="搜索常见问题" @keyup.enter="doFaqSearch">
+              <button v-if="faqQuery" type="button" class="faq-search-clear" @click="clearFaqSearch" aria-label="清空搜索">&times;</button>
+              <button type="button" class="faq-search-btn" aria-label="搜索" @click="doFaqSearch">
+                <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true">
+                  <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                  <line x1="13.5" y1="13.5" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="faq-wrap">
+          <p v-if="faqSearching" class="faq-search-hint" role="status">
+            找到 {{ visibleFaqs.length }} 个与「{{ faqKeyword.trim() }}」相关的问题
+          </p>
+          <div class="faq-list" v-if="visibleFaqs.length">
+            <div v-for="(f, i) in visibleFaqs" :key="f.q" class="faq-item" :class="{ 'is-open': f.open }">
+              <button class="faq-q" type="button" :aria-expanded="String(f.open)" @click="toggleFaq(f)">
+                <strong>{{ f.q }}</strong>
+                <span class="faq-toggle" aria-hidden="true"></span>
+              </button>
+              <div class="faq-a"><p>{{ f.a }}</p></div>
+            </div>
+          </div>
+          <div v-else class="faq-empty">
+            <p>没有找到与「{{ faqKeyword.trim() }}」相关的问题</p>
+            <small>换个关键词试试，或直接联系顾问为你解答</small>
+            <a href="#consult" @click.prevent="openConsult('FAQ 搜索无结果咨询')">在线咨询顾问</a>
+          </div>
+          <nav v-if="!faqSearching && faqTotalPages > 1" class="pager faq-pager" aria-label="FAQ 分页">
+            <button type="button" :disabled="faqPage === 1" aria-label="上一页" @click="faqGoPage('prev')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <template v-for="(p, i) in faqPagerPages" :key="'faqp-' + i">
+              <span v-if="p === '…'" class="pager-ellipsis">…</span>
+              <button v-else type="button" :class="{ 'is-active': p === faqPage }" @click="faqGoPage(p)">{{ p }}</button>
+            </template>
+            <button type="button" :disabled="faqPage === faqTotalPages" aria-label="下一页" @click="faqGoPage('next')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </nav>
+        </div>
+      </section>
+
+      <!-- ============ 文章详情视图（点面包屑「最新资讯」返回列表） ============ -->
+      <section v-else class="section page-width" aria-label="文章详情">
+        <article class="article-detail" @click="handleDetailClick" v-html="detailHtml"></article>
+      </section>
+
+      <section id="consult" class="cta-section">
+        <span class="cta-decor" aria-hidden="true"></span>
+        <div class="page-width cta-content">
+          <span>YOUR DREAM · OUR MISSION</span>
+          <h2>领取1对1专属升学规划方案</h2>
+          <p>填写信息，资深顾问免费为你做背景评估、选校定位</p>
+          <div class="cta-dropdown">
+            <button type="button" :aria-expanded="consultMenuVisible" aria-haspopup="true" :class="{'is-open': consultMenuVisible}" @click="toggleConsultMenu">
+              立即预约评估
+              <b>▾</b>
+            </button>
+            <ul v-if="consultMenuVisible" class="cta-menu">
+              <li v-for="item in consultOptions" :key="item">
+                <button type="button" @click="selectConsultOption(item)">{{ item }}</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="about" class="home-footer">
+      <div class="page-width footer-main">
+        <div class="footer-column footer-intro">
+          <h3>关于我们</h3>
+          <p>所样国际艺术教育由一群来自世界顶尖艺术设计院校的设计师、讲师和艺术家于 2019 年在上海创立，是专注于多元化国际艺术服务的联合艺术聚集空间。</p>
+        </div>
+        <div class="footer-column footer-links">
+          <h3>业务导览</h3>
+          <p>艺术留学作品集 <br>
+            名校爬藤<br>
+            国际课程 A-LEVEL | BTEC | AP<br>
+            背景提升<br>
+            SO DO创意思维实验室<br>
+            国际奖项<br>
+            研究生预推免 <br>
+           </p>
+        </div>
+        <div class="footer-column footer-contact">
+          <h3>校区联系</h3>
+          <p>北京：400-879-0619</p>
+          <p>上海：021-60190648</p>
+        </div>
+        <div class="footer-column footer-social-column">
+          <h3>关注我们</h3>
+          <div class="footer-social-row">
+            <div class="footer-qr-list">
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')" @keydown.enter.prevent="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')" @keydown.space.prevent="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')"><img src="./image/shnghai-officialaccount.jpg" alt="公众号二维码"><span>公众号</span></div>
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shanghai-redbook.png', '小红书二维码')" @keydown.enter.prevent="openQr('./image/shanghai-redbook.png', '小红书二维码')" @keydown.space.prevent="openQr('./image/shanghai-redbook.png', '小红书二维码')"><img src="./image/shanghai-redbook.png" alt="小红书二维码"><span>小红书</span></div>
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shanghai-douyin.png', '抖音二维码')" @keydown.enter.prevent="openQr('./image/shanghai-douyin.png', '抖音二维码')" @keydown.space.prevent="openQr('./image/shanghai-douyin.png', '抖音二维码')"><img src="./image/shanghai-douyin.png" alt="抖音二维码"><span>抖音</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-width footer-bottom">
+        <span><a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer">苏ICP备12006634号-12</a> | 版权所有 ©所样国际艺术中心</span>
+      </div>
+    </footer>
+
+    <aside class="floating-contact" aria-label="快捷联系">
+      <button type="button" @click="openConsult('电话咨询')"><img class="floating-icon" src="./image/phone.png" alt="电话咨询">在线咨询</button>
+      <button type="button" aria-haspopup="dialog" @click="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')">
+        <svg class="floating-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.69 3.5c-3.7 0-6.69 2.5-6.69 5.57 0 1.77 1 3.35 2.55 4.38l-.64 1.93 2.24-1.12c.79.22 1.64.35 2.54.35.15 0 .3 0 .45-.01a5.06 5.06 0 0 1-.21-1.43c0-3.07 2.99-5.56 6.67-5.56.22 0 .44.01.66.03C15.42 5.05 12.3 3.5 8.69 3.5zM6.6 6.7a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zm4.2 0a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zm4.11 1.83c-3.31 0-6 2.29-6 5.11s2.69 5.11 6 5.11c.62 0 1.22-.08 1.79-.22l2.05 1.03-.55-1.66C19.75 17 21 15.5 21 13.64c0-2.82-2.78-5.11-6.09-5.11zm-2.06 2.6a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5zm4.1 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"/></svg>
+        公众号
+      </button>
+      <a href="#top"><span>↑</span>返回顶部</a>
+    </aside>
+
+    <div v-if="dialogVisible" class="dialog-backdrop" @click.self="dialogVisible = false">
+      <div class="consult-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+        <button class="dialog-close" type="button" aria-label="关闭" @click="dialogVisible = false">×</button>
+        <small>CONTACT US</small>
+        <h2 id="dialog-title">{{ consultTopic }}</h2>
+        <p>请选择所在城市，通过电话或微信联系我们。</p>
+        <div class="contact-city-list">
+          <article class="contact-city-card">
+            <div class="contact-city-copy">
+              <span>BEIJING</span>
+              <h3>北京</h3>
+              <a href="tel:4008790619">400-879-0619</a>
+              <p>微信扫码咨询</p>
+            </div>
+            <img src="./image/beijing-wechat.png" alt="北京微信二维码">
+          </article>
+          <article class="contact-city-card">
+            <div class="contact-city-copy">
+              <span>SHANGHAI</span>
+              <h3>上海</h3>
+              <a href="tel:02160190648">021-60190648</a>
+              <p>微信扫码咨询</p>
+            </div>
+            <img src="./image/shanghai-wechat.png" alt="上海微信二维码">
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="qrPreview" class="dialog-backdrop" @click.self="closeQr()">
+      <div class="qr-dialog" role="dialog" aria-modal="true" :aria-label="qrLabel">
+        <button class="dialog-close" type="button" aria-label="关闭" @click="closeQr()">×</button>
+        <img :src="qrPreview" :alt="qrLabel">
+        <p>{{ qrLabel }}</p>
+        <small>长按或扫码关注</small>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/vue.global.prod.js"></script>
+  <script src="./js/site-common.js"></script>
+  <script src="./js/news.js"></script>
+</body>
+</html>

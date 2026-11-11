@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="按录取分类查看所样学员案例、录取院校及项目作品。">
+  <title>学员列表｜所样国际艺术中心</title>
+  <link rel="stylesheet" href="./css/common.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <link rel="stylesheet" href="./css/phase2.css">
+  <link rel="stylesheet" href="./css/student-cases.css">
+  <link rel="icon" href="./image/suoyang.ico">
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="announcement" role="button" tabindex="0" aria-label="26申请季录取捷报持续更新，免费领取选校评估方案"
+         @click="openConsult('免费领取选校评估方案')" @keydown.enter.prevent="openConsult('免费领取选校评估方案')"
+         @keydown.space.prevent="openConsult('免费领取选校评估方案')">
+      <div class="page-width announcement-inner">
+        <span>26申请季录取捷报持续更新</span>
+        <span class="announcement-dot"></span>
+        <span>免费领取选校评估方案</span>
+      </div>
+    </div>
+
+    <header class="home-header">
+      <div class="page-width header-content">
+        <a class="home-logo" href="./index.html" aria-label="所样艺术教育首页">
+          <img src="./image/suoyang-international-art-center.png" alt="所样国际艺术中心">
+        </a>
+        <nav class="home-nav" aria-label="主导航">
+          <a href="./index.html">首页</a>
+          <a href="./index.html#courses">学术研究中心</a>
+          <a href="./index.html#system">六大艺术科系</a>
+          <a href="./index.html#results" class="is-active">部分录取成果展示</a>
+          <!--<a href="./index.html#about">师资团队</a>-->
+          <a href="./index.html#events">课程活动</a>
+          <a href="./news.html">最新资讯</a>
+          <a href="./index.html#about">关于所样</a>
+        </nav>
+        <div class="header-actions">
+          <button class="outline-button" type="button" @click="openConsult('课程咨询')">预约试听</button>
+          <button class="solid-button" type="button" @click="openConsult('留学规划')">免费留学评估</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top" class="student-list-main page-width">
+      <nav class="student-detail-breadcrumb" aria-label="面包屑"><a href="./index.html">首页</a><span aria-hidden="true">/</span><a href="./index.html#results">部分录取成果展示</a><span aria-hidden="true">/</span><span>{{ category ? category.name : '未找到分类' }}</span></nav>
+      <header class="student-list-heading"><span class="section-kicker">STUDENT OUTCOMES</span><h1>{{ categoryTitle }}</h1><p>查看学员录取院校、专业与项目作品</p></header>
+      <template v-if="category">
+        <div v-if="students.length" ref="studentList" class="student-list-grid" tabindex="-1" aria-label="学员案例列表"><student-card v-for="student in visibleStudents" :key="student.id" :id="student.id" :student="student" :href="studentHref(student.id)" show-works></student-card></div>
+        <nav v-if="students.length" class="student-list-pagination" aria-label="学员列表分页">
+          <div class="student-page-controls">
+            <button type="button" aria-label="上一页" :disabled="page===1" :title="page===1?'已是第一页':'上一页'" @click="goToPage(page-1)">‹</button>
+            <template v-for="(item,index) in pageItems" :key="index"><span v-if="item==='…'" class="student-page-ellipsis" aria-hidden="true">…</span><button v-else type="button" :class="{'is-active':page===item}" :aria-current="page===item?'page':null" :aria-label="'第'+item+'页'" @click="goToPage(item)">{{item}}</button></template>
+            <button type="button" aria-label="下一页" :disabled="page===totalPages" :title="page===totalPages?'已是最后一页':'下一页'" @click="goToPage(page+1)">›</button>
+          </div>
+          <span class="student-page-status" role="status">第 {{page}} / {{totalPages}} 页</span>
+        </nav>
+        <div v-else class="case-empty" role="status"><strong>该分类学员案例待补充</strong><p>资料补充后，将展示学员照片、录取院校与专业及项目作品。</p></div>
+      </template>
+      <section v-else class="case-empty" role="status"><strong>未找到该录取分类</strong><p>请返回首页，选择对应的录取分类查看学员案例。</p></section>
+    </main>
+    <footer id="about" class="home-footer">
+      <div class="page-width footer-main">
+        <div class="footer-column footer-intro">
+          <h3>关于我们</h3>
+          <p>所样国际艺术教育由一群来自世界顶尖艺术设计院校的设计师、讲师和艺术家于 2019 年在上海创立，是专注于多元化国际艺术服务的联合艺术聚集空间。</p>
+        </div>
+        <div class="footer-column footer-links">
+          <h3>业务导览</h3>
+          <p>艺术留学作品集 <br>
+            名校爬藤<br>
+            国际课程 A-LEVEL | BTEC | AP<br>
+            背景提升<br>
+            SO DO创意思维实验室<br>
+            国际奖项<br>
+            研究生预推免 <br>
+           </p>
+        </div>
+        <div class="footer-column footer-contact">
+          <h3>校区联系</h3>
+          <p>北京：400-879-0619</p>
+          <p>上海：021-60190648</p>
+        </div>
+        <div class="footer-column footer-social-column">
+          <h3>关注我们</h3>
+          <div class="footer-social-row">
+            <div class="footer-qr-list">
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')" @keydown.enter.prevent="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')" @keydown.space.prevent="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')"><img src="./image/shnghai-officialaccount.jpg" alt="公众号二维码"><span>公众号</span></div>
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shanghai-redbook.png', '小红书二维码')" @keydown.enter.prevent="openQr('./image/shanghai-redbook.png', '小红书二维码')" @keydown.space.prevent="openQr('./image/shanghai-redbook.png', '小红书二维码')"><img src="./image/shanghai-redbook.png" alt="小红书二维码"><span>小红书</span></div>
+              <div class="footer-qr" role="button" tabindex="0" @click="openQr('./image/shanghai-douyin.png', '抖音二维码')" @keydown.enter.prevent="openQr('./image/shanghai-douyin.png', '抖音二维码')" @keydown.space.prevent="openQr('./image/shanghai-douyin.png', '抖音二维码')"><img src="./image/shanghai-douyin.png" alt="抖音二维码"><span>抖音</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-width footer-bottom">
+        <span><a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer">苏ICP备12006634号-12</a> | 版权所有 ©所样国际艺术中心</span>
+      </div>
+    </footer>
+
+    <aside class="floating-contact" aria-label="快捷联系">
+      <button type="button" @click="openConsult('电话咨询')"><img class="floating-icon" src="./image/phone.png" alt="电话咨询">在线咨询</button>
+      <button type="button" aria-haspopup="dialog" @click="openQr('./image/shnghai-officialaccount.jpg', '公众号二维码')">
+        <svg class="floating-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.69 3.5c-3.7 0-6.69 2.5-6.69 5.57 0 1.77 1 3.35 2.55 4.38l-.64 1.93 2.24-1.12c.79.22 1.64.35 2.54.35.15 0 .3 0 .45-.01a5.06 5.06 0 0 1-.21-1.43c0-3.07 2.99-5.56 6.67-5.56.22 0 .44.01.66.03C15.42 5.05 12.3 3.5 8.69 3.5zM6.6 6.7a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zm4.2 0a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zm4.11 1.83c-3.31 0-6 2.29-6 5.11s2.69 5.11 6 5.11c.62 0 1.22-.08 1.79-.22l2.05 1.03-.55-1.66C19.75 17 21 15.5 21 13.64c0-2.82-2.78-5.11-6.09-5.11zm-2.06 2.6a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5zm4.1 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"/></svg>
+        公众号
+      </button>
+      <a href="#top"><span>↑</span>返回顶部</a>
+    </aside>
+
+    <div v-if="dialogVisible" class="dialog-backdrop" @click.self="dialogVisible = false">
+      <div class="consult-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+        <button class="dialog-close" type="button" aria-label="关闭" @click="dialogVisible = false">×</button>
+        <small>CONTACT US</small>
+        <h2 id="dialog-title">{{ consultTopic }}</h2>
+        <p>请选择所在城市，通过电话或微信联系我们。</p>
+        <div class="contact-city-list">
+          <article class="contact-city-card">
+            <div class="contact-city-copy">
+              <span>BEIJING</span>
+              <h3>北京</h3>
+              <a href="tel:4008790619">400-879-0619</a>
+              <p>微信扫码咨询</p>
+            </div>
+            <img src="./image/beijing-wechat.png" alt="北京微信二维码">
+          </article>
+          <article class="contact-city-card">
+            <div class="contact-city-copy">
+              <span>SHANGHAI</span>
+              <h3>上海</h3>
+              <a href="tel:02160190648">021-60190648</a>
+              <p>微信扫码咨询</p>
+            </div>
+            <img src="./image/shanghai-wechat.png" alt="上海微信二维码">
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="qrPreview" class="dialog-backdrop" @click.self="closeQr()">
+      <div class="qr-dialog" role="dialog" aria-modal="true" :aria-label="qrLabel">
+        <button class="dialog-close" type="button" aria-label="关闭" @click="closeQr()">×</button>
+        <img :src="qrPreview" :alt="qrLabel">
+        <p>{{ qrLabel }}</p>
+        <small>长按或扫码关注</small>
+      </div>
+    </div>
+
+  </div>
+  <script src="./js/vue.global.prod.js"></script>
+  <script src="./js/site-common.js"></script>
+  <script src="./js/student-cases.js"></script>
+  <script src="./js/student-ui.js"></script>
+  <script src="./js/offer-format.js"></script>
+  <script src="./js/student-list.js"></script>
+</body>
+</html>

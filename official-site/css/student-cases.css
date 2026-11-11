@@ -1,0 +1,229 @@
+/* 学员案例：仅作用于本轮新增模块与作品标注。 */
+.elite-section { padding-top: 48px; padding-bottom: 48px; }
+.elite-heading { text-align: left; margin-bottom: 26px; }
+.elite-heading h2 { margin: 6px 0 9px; color: #171822; font-size: 28px; letter-spacing: 1px; }
+.elite-heading p { margin: 0; color: #686b78; font-size: 12px; line-height: 1.8; }
+.elite-heading .section-kicker { margin: 0; }
+.case-heading-line { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.admission-board { display: flex; flex-direction: column; align-items: stretch; border-top: 1px solid #e9e9ef; border-bottom: 1px solid #e9e9ef; }
+.admission-board-title { display: flex; align-items: center; justify-content: center; padding: 24px 0 12px; text-align: center; }
+.admission-board-title strong { color: #24212f; font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 19px; font-weight: 700; letter-spacing: 1px; line-height: 1.5; white-space: nowrap; }
+.admission-board-window { width: 100%; min-width: 0; overflow-x: auto; padding: 12px 0 25px; scrollbar-width: thin; scrollbar-color: #cfc5ee transparent; }
+.admission-board-window:focus-visible { outline: 2px solid #7767f8; outline-offset: 4px; }
+.admission-board-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 22px; margin: 0; padding: 0 12px; list-style: none; }
+.admission-board-item { display: flex; align-items: center; flex-direction: column; min-width: 0; text-align: center; }
+.admission-school-logo { display: flex; align-items: center; justify-content: center; width: 148px; max-width: 100%; height: 132px; margin-bottom: 14px; padding: 12px; background: #fff; }
+.admission-school-logo img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+.admission-school-logo.is-empty { border-radius: 8px; background: linear-gradient(135deg, #ece7fa, #ddd3f5); color: #65557f; }
+.admission-school-logo svg { width: 48px; height: 48px; }
+.admission-school-name { color: #383442; font-size: 15px; font-weight: 600; line-height: 1.6; }
+.admission-school-rate { display: flex; align-items: baseline; justify-content: center; gap: 7px; margin-top: 8px; }
+.admission-school-rate strong { color: #7767f8; font: 700 26px/1.2 Arial, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
+.admission-school-rate span { color: #8a8496; font-size: 11px; }
+.elite-carousel { position: relative; padding: 30px 50px 0; }
+.elite-swiper { overflow: hidden; padding: 14px 0 22px; }
+.elite-swiper .swiper-wrapper { align-items: center; }
+.elite-swiper .swiper-slide { height: auto; opacity: .57; transform: scale(.93); transition: opacity .35s, transform .35s; }
+.elite-swiper .swiper-slide-active { opacity: 1; transform: scale(1); }
+.student-card { overflow: hidden; min-width: 0; border: 1px solid #eeedf3; border-radius: 15px; background: #fff; transition: box-shadow .25s, border-color .25s; }
+.student-card:hover { border-color: #d5ceff; box-shadow: 0 14px 35px rgba(41, 30, 95, .08); }
+.elite-swiper .swiper-slide-active .student-card { box-shadow: 0 16px 32px rgba(30, 24, 76, .08); }
+.student-card-main { display: block; }
+.case-image { position: relative; display: block; width: 100%; overflow: hidden; background: linear-gradient(135deg, #f5f4f9, #edebf5); }
+.case-image.is-empty { background: linear-gradient(135deg, #ece7fa, #ddd3f5); }
+.case-image > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.case-image--portrait { aspect-ratio: 1.08; }
+.case-placeholder { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; width: 100%; height: 100%; color: #65557f; font-size: 11px; letter-spacing: 1px; }
+.case-placeholder svg { width: 42px; height: 42px; stroke: currentColor; stroke-width: 1.2; opacity: .7; }
+.student-card-copy { padding: 17px 16px 18px; text-align: center; }
+.student-card h3 { margin: 0 0 8px; color: #252431; font-size: 16px; }
+.student-offer-lines { padding: 0; margin: 0; list-style: none; color: #7a7885; font-size: 11px; line-height: 1.9; }
+.student-offer-lines strong { color: #4b4958; font-weight: 600; }
+.student-card.is-placeholder .student-offer-lines strong { color: #8c859b; font-weight: 400; }
+.student-card.is-placeholder .student-card-copy { min-height: 134px; }
+.student-detail-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; color: #7767f8; font-size: 12px; font-weight: 700; }
+.elite-arrow { position: absolute; z-index: 2; top: 45%; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 1px solid #f0eff5; border-radius: 50%; background: #fff; box-shadow: 0 7px 20px #2420321c; color: #66616f; font-size: 22px; }
+.elite-arrow.prev { left: 0; }
+.elite-arrow.next { right: 0; }
+.elite-arrow:hover { background: #7767f8; color: #fff; }
+.elite-arrow:disabled { opacity: .3; cursor: default; }
+.elite-pagination { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 2px 0 0; }
+.elite-dot { display: flex; align-items: center; justify-content: center; width: 22px; height: 24px; padding: 0; background: transparent; }
+.elite-dot::before { width: 7px; height: 7px; content: ""; background: #cccbd6; border-radius: 8px; transition: width .2s, background .2s; }
+.elite-dot.is-active::before { width: 22px; background: #7767f8; }
+.student-list-main { min-height: 60vh; }
+.student-list-heading { padding: 38px 0 26px; border-bottom: 1px solid #ede9f3; }
+.student-list-heading h1 { margin: 8px 0 12px; color: #24212f; font-size: 32px; }
+.student-list-heading p { margin: 0; color: #8c859b; font-size: 13px; }
+.student-list-main > .case-empty { margin-top: 28px; }
+.student-list-main .student-list-grid { margin: 28px 0 32px; scroll-margin-top: var(--case-anchor-offset, 90px); }
+.student-list-main .student-card { scroll-margin-top: var(--case-anchor-offset, 90px); }
+.student-list-grid:focus { outline: none; }
+.student-list-pagination { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 32px 0 48px; }
+.student-page-controls { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 6px; max-width: 100%; }
+.student-page-controls button { min-width: 30px; height: 32px; padding: 0 7px; border: 1px solid #e5e0f0; border-radius: 4px; background: #fff; color: #84798e; font: inherit; font-size: 12px; cursor: pointer; }
+.student-page-controls button:hover:not(:disabled) { border-color: #7767f8; color: #7767f8; }
+.student-page-controls button.is-active { border-color: #7767f8; background: #7767f8; color: #fff; }
+.student-page-controls button.is-active:hover { color: #fff; }
+.student-page-controls button:disabled { background: #f7f5fb; color: #c4bed0; cursor: not-allowed; }
+.student-page-ellipsis { min-width: 24px; color: #a8a1b7; text-align: center; font-size: 12px; }
+.student-page-status { color: #9b93a8; font-size: 12px; }
+.student-list-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.student-list-grid .student-card { display: flex; flex-direction: column; }
+.student-list-grid .student-card-main { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: start; gap: 16px; padding: 20px; }
+.student-list-grid .case-image--portrait { width: 64px; height: 80px; aspect-ratio: 4 / 5; border-radius: 4px; }
+.student-list-grid .case-image--portrait .case-placeholder svg { width: 28px; height: 28px; }
+.student-list-grid .case-image--portrait .case-placeholder > span { display: none; }
+.student-list-grid .student-card-copy { min-width: 0; padding: 0; text-align: left; }
+.student-list-grid .student-card h3 { margin-bottom: 10px; font-size: 18px; }
+.student-list-grid .student-offer-lines { font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.student-list-grid .student-offer-lines li + li { margin-top: 4px; }
+.student-list-grid .student-card.is-placeholder .student-card-copy { min-height: 130px; }
+.student-list-grid .student-work-thumbs { gap: 8px; margin-top: auto; padding: 0 20px 20px; }
+.student-list-grid .student-work-thumbs .case-image { aspect-ratio: 1.1; }
+.student-work-thumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; padding: 0 14px 16px; }
+.student-work-thumbs > a { flex: 1; min-width: 0; }
+.student-work-thumbs .case-image { aspect-ratio: 1.35; border-radius: 6px; }
+.student-work-thumbs .case-placeholder { font-size: 9px; letter-spacing: 0; gap: 3px; }
+.student-work-thumbs .case-placeholder svg { width: 22px; height: 22px; }
+.student-no-works { color: #9b96aa; font-size: 11px; }
+.student-work-thumbs > a > .case-image { height: auto; }
+.case-empty { padding: 48px 24px; border: 1px dashed #ddd7ec; border-radius: 12px; background: #fbfaff; text-align: center; }
+.case-empty strong { display: block; margin-bottom: 10px; color: #5b536e; font-size: 18px; }
+.case-empty p { margin: 0; color: #9992a8; font-size: 13px; line-height: 1.8; }
+.case-empty a { display: inline-block; margin-top: 22px; color: #7767f8; }
+.student-detail-main { min-height: 60vh; }
+.student-not-found { margin: 36px 0 70px; }
+.student-detail-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 30px; color: #9a94a9; font-size: 12px; }
+.student-detail-breadcrumb a:hover { color: #7767f8; }
+.student-overview { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(0, 2.6fr); align-items: start; gap: 40px; padding: 38px 0 52px; }
+.student-profile, .student-offers { min-width: 0; }
+.student-profile-heading { display: flex; align-items: center; gap: 14px; }
+.student-profile-heading > .case-image { flex: 0 0 56px; height: 70px; aspect-ratio: 4 / 5; }
+.student-profile-heading .case-placeholder { font-size: 9px; letter-spacing: 0; gap: 6px; }
+.student-profile-heading .case-placeholder svg { width: 26px; height: 26px; }
+.student-profile-heading .case-placeholder > span { display: none; }
+.student-profile h1 { margin: 7px 0 10px; color: #171822; font-size: 32px; }
+.student-admissions-title { margin: 28px 0 0; color: #34303e; font-size: 17px; font-weight: 600; line-height: 1.6; }
+.student-admissions { display: grid; gap: 21px; margin: 14px 0 0; padding: 0; list-style: none; }
+.student-admissions li { min-width: 0; }
+.student-admissions strong { display: block; color: #34303e; font-size: 15px; font-weight: 600; line-height: 1.8; overflow-wrap: anywhere; }
+.student-admissions span { display: block; margin-top: 3px; color: #777180; font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; }
+.student-section-title.section-heading { margin-bottom: 34px; }
+.student-section-title.section-heading h2 { font-size: 26px; }
+.student-offer-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.offer-card { overflow: hidden; min-width: 0; border: 2px solid var(--home-primary, #7667f8); border-radius: 0; background: #fff; }
+.offer-card-head { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 9px; min-height: 91px; padding: 13px 12px; background: var(--home-primary, #7667f8); color: #fff; }
+.offer-card-meta { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 6px 8px; width: 100%; }
+.offer-term { flex-shrink: 0; margin-left: auto; color: #fff; font: 500 11px/1.4 Arial, sans-serif; white-space: nowrap; }
+.offer-wordmark { flex-shrink: 0; display: flex; flex-direction: column; }
+.offer-wordmark b { font: 800 11px Arial, sans-serif; letter-spacing: 2px; }
+.offer-wordmark small { font-size: 8px; letter-spacing: 1px; }
+.offer-school { line-height: 1.6; font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
+.offer-program { display: flex; flex-wrap: wrap; align-items: center; align-content: center; gap: 7px; min-height: 60px; padding: 12px 10px; }
+.offer-program h3 { margin: 0; color: #191624; font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.offer-degree { color: var(--home-primary, #7667f8); font: 700 11px Arial, sans-serif; }
+.offer-media { display: block; width: calc(100% - 20px); padding: 0; margin: 0 10px 10px; border: 0; border-radius: 0; overflow: hidden; background: #f1eef8; }
+.offer-media > .case-image { aspect-ratio: 3 / 4; }
+.offer-media .case-image > img { object-fit: contain; }
+.project-gallery { display: grid; gap: 24px; padding-bottom: 48px; }
+.student-project { margin: 0; scroll-margin-top: 100px; }
+.student-project-media { display: block; width: 100%; border: 0; padding: 0; background: transparent; border-radius: 0; overflow: hidden; }
+.student-project-media .case-image { aspect-ratio: 2; }
+.student-project-media img { object-fit: contain; background: #f7f6fa; }
+.empty-project-image { min-height: 250px; }
+.student-return { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 56px; padding: 13px 22px; color: #7767f8; border: 1px solid #ddd6ff; border-radius: 7px; font-size: 13px; }
+.student-lightbox-backdrop { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 35px; background: rgba(20, 17, 35, .82); }
+.student-lightbox { position: relative; width: min(1100px, 100%); max-height: 92vh; padding: 24px; border-radius: 12px; background: #fff; text-align: center; }
+.student-lightbox img { display: block; width: 100%; max-height: 75vh; object-fit: contain; }
+.student-lightbox p { color: #70677f; font-size: 13px; }
+.student-lightbox .dialog-close { right: 8px; top: 5px; z-index: 1; }
+.department-work-card { position: relative; display: block; overflow: hidden; background: #f5f4f9; }
+.department-work-image { display: flex; align-items: center; width: 100%; }
+.department-work-image > .case-image { aspect-ratio: 2; }
+.department-work-image > img { display: block; width: 100%; height: auto; }
+.department-work-info { position: static; display: grid; grid-template-columns: minmax(0, 1fr) 64px; align-items: center; gap: 12px; height: 72px; padding: 20px 14px; background: #f6f5f8; color: #59417f; text-align: left; }
+.department-work-copy { min-width: 0; min-height: 0; overflow-x: auto; overflow-y: hidden; color: inherit; overscroll-behavior: contain; scrollbar-width: none; scroll-snap-type: x proximity; }
+.department-work-copy::-webkit-scrollbar { display: none; }
+.department-work-admissions { display: flex; align-items: start; gap: 12px; min-width: 100%; margin: 0; padding: 0; list-style: none; }
+.department-work-admissions li { display: flex; flex: 0 0 auto; flex-direction: column; gap: 2px; min-width: min(108px, calc((100% - 84px) / 8)); color: inherit; font-size: 11px; line-height: 14px; scroll-snap-align: start; }
+.department-work-offer-heading { display: block; font-weight: 400; white-space: nowrap; }
+.department-work-degree { white-space: nowrap; }
+.department-work-program { display: block; font-size: 10px; font-weight: 400; line-height: 14px; white-space: nowrap; }
+.department-work-student-panel { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 0; text-align: right; }
+.department-work-student { color: inherit; font-size: 11px; font-weight: 400; line-height: 14px; white-space: nowrap; }
+.department-work-detail { color: #7667f8; font-size: 10px; line-height: 14px; white-space: nowrap; }
+.department-work-detail:hover { text-decoration: underline; }
+.department-work-card--side { display: grid; grid-template-columns: minmax(0, 1fr) 180px; background: #f6f5f8; }
+.department-work-card--side .department-work-image { grid-column: 1; align-self: start; }
+.department-work-card--side .department-work-info { position: static; grid-column: 2; display: flex; flex-direction: column; align-items: stretch; gap: 10px; width: 180px; height: auto; padding: 14px 12px; background: #f6f5f8; }
+.department-work-card--side .department-work-copy { flex: 1; overflow: visible; scroll-snap-type: none; }
+.department-work-card--side .department-work-admissions { flex-direction: column; gap: 7px; }
+.department-work-card--side .department-work-admissions li { gap: 2px; min-width: 0; width: 100%; font-size: 11px; line-height: 15px; }
+.department-work-card--side .department-work-offer-heading { white-space: normal; overflow-wrap: anywhere; }
+.department-work-card--side .department-work-program { font-size: 11px; line-height: 15px; white-space: normal; overflow-wrap: anywhere; }
+.department-work-card--side .department-work-student-panel { flex: 0 0 auto; flex-direction: row; justify-content: space-between; align-items: center; gap: 12px; text-align: left; }
+.department-work-title { flex: 0 0 auto; margin: 0; color: inherit; font-size: 14px; font-weight: 500; line-height: 1.6; }
+.department-work-copy:focus-visible { outline-offset: -2px !important; }
+:is(.elite-section, .student-list-main, .student-detail-main, .works-section) :is(a, button):focus-visible { outline: 2px solid #7767f8; outline-offset: 4px; }
+@media (max-width: 1000px) {
+    .admission-board-list { gap: 16px; }
+    .admission-school-logo { width: 128px; height: 116px; }
+    .admission-school-name { font-size: 14px; }
+    .admission-school-rate strong { font-size: 24px; }
+    .elite-carousel { padding-right: 38px; padding-left: 38px; }
+    .elite-arrow { width: 30px; height: 30px; }
+    .student-list-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .student-offer-grid { gap: 14px; }
+    .student-overview { grid-template-columns: minmax(210px, 1fr) minmax(0, 2.6fr); gap: 26px; }
+}
+@media (max-width: 780px) {
+    .student-overview { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+}
+@media (max-width: 640px) {
+    .elite-section { padding-top: 30px; padding-bottom: 30px; }
+    .elite-heading h2 { font-size: 24px; }
+    .elite-heading p { font-size: 11px; }
+    .case-heading-line { gap: 8px; }
+    .admission-board-title { padding: 20px 0 10px; }
+    .admission-board-title strong { font-size: 17px; }
+    .admission-board-window { padding: 10px 0 20px; scroll-snap-type: x mandatory; }
+    .admission-board-list { grid-template-columns: repeat(5, 142px); gap: 18px; padding: 0 8px; width: max-content; }
+    .admission-board-item { scroll-snap-align: start; scroll-margin-left: 8px; }
+    .admission-school-logo { width: 126px; height: 116px; margin-bottom: 12px; }
+    .admission-school-rate strong { font-size: 22px; }
+    .elite-carousel { margin: 0 -8px; padding: 22px 30px 0; }
+    .elite-swiper { padding-top: 10px; }
+    .elite-arrow { width: 28px; height: 28px; }
+    .student-card-copy { padding: 16px 12px; }
+    .student-card h3 { font-size: 16px; }
+    .student-list-heading { padding: 28px 0 22px; }
+    .student-list-heading h1 { font-size: 26px; }
+    .student-list-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .student-offer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .student-list-grid .student-card-main { grid-template-columns: 56px minmax(0, 1fr); gap: 12px; padding: 16px; }
+    .student-list-grid .case-image--portrait { width: 56px; height: 70px; }
+    .student-list-grid .student-work-thumbs { padding: 0 16px 16px; }
+    .student-work-thumbs .case-image { aspect-ratio: 1.8; }
+    .student-overview { padding: 28px 0 36px; }
+    .student-profile h1 { font-size: 28px; }
+    .student-admissions-title { margin-top: 22px; font-size: 16px; }
+    .student-admissions { gap: 15px; margin-top: 12px; }
+    .offer-card-head { min-height: 94px; padding: 12px 10px; }
+    .offer-program h3 { font-size: 13px; }
+    .student-project-media .case-image { aspect-ratio: 1.25; }
+    .department-work-image > .case-image { aspect-ratio: 1; }
+    .department-work-info { grid-template-columns: minmax(0, 1fr) 48px; gap: 10px; padding: 20px 66px 20px 10px; }
+    .department-work-admissions li { min-width: 124px; }
+    .department-work-card--side { display: block; }
+    .department-work-card--side .department-work-info { position: static; display: flex; align-items: stretch; gap: 10px; width: 100%; height: auto; padding: 12px 66px 12px 14px; }
+    .department-work-card--side .department-work-admissions { gap: 7px; }
+    .department-work-card--side .department-work-admissions li { min-width: 0; }
+    .department-work-card--side .department-work-student-panel { align-items: center; }
+    .works-section .work-arrow { top: 36px; }
+    .student-lightbox-backdrop { padding: 15px; }
+    .student-lightbox { padding: 26px 12px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .elite-swiper .swiper-slide { transition: none; }
+}
