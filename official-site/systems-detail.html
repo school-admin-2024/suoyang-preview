@@ -132,6 +132,7 @@
           <h2>{{ system.name }}优秀学员案例</h2>
         </div>
         <div class="work-pills" role="list" :aria-label="system.name + '专业分类'">
+          <span class="work-major-label" role="listitem">全部</span>
           <span v-for="major in workMajors" :key="'work-' + major" class="work-major-label" role="listitem">{{ major }}</span>
         </div>
         <div v-if="cases.length" class="work-carousel">
