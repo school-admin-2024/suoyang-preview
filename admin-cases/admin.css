@@ -16,6 +16,7 @@
 .field .program-readonly{background:#f5f7fa;color:#606266;cursor:default}
 .board-logo-field .upload-target img,.board-logo-cell .thumb img{object-fit:contain;padding:5px;background:#fff}
 .board-logo-cell .thumb{width:46px;height:46px;border-radius:4px;background:#fff;border:1px solid var(--line)}
+.student-departments>span{display:block;color:var(--ink);cursor:default}
 .form-card>.field-error{margin-top:8px}
 .field input[aria-invalid=true]:not([type=file]),.field select[aria-invalid=true],.work-offer-options[aria-invalid=true],.upload-target:has(input[aria-invalid=true]){border-color:#f56c6c}
 .field input[aria-invalid=true]:focus,.field select[aria-invalid=true]:focus{outline-color:#f56c6c}
