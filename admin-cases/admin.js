@@ -14,11 +14,11 @@
         data() {
             // Field validation starts after the first save attempt, then follows live form values.
             const initial={db:fresh(),warning:''};
-            return {degreeManager:false,studentSubmitted:false,boardSubmitted:false,degreeSubmitted:false,degreeFilters:{keyword:'',status:''},appliedDegreeFilters:{keyword:'',status:''},degreePage:1,ready:false,storageReady:false,saving:false,db:initial.db,storageWarning:initial.warning,menu:menus,view:menus.some(m=>m.id===location.hash.slice(1))?location.hash.slice(1):'students',role:'admin',openTabIds:['students'],navOpen:false,menuKeyword:'',filters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},appliedFilters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},page:1,boardFilters:{keyword:'',status:''},appliedBoardFilters:{keyword:'',status:''},boardPage:1,department:'fashion',editor:false,editorMode:'edit',form:null,formInitial:'',formError:'',uploading:0,smallForm:null,smallInitial:'',confirmation:null,preview:null,toast:null};
+            return {degreeManager:false,studentSubmitted:false,boardSubmitted:false,degreeSubmitted:false,degreeFilters:{keyword:'',status:''},appliedDegreeFilters:{keyword:'',status:''},degreePage:1,ready:false,storageReady:false,saving:false,db:initial.db,storageWarning:initial.warning,menu:menus,view:menus.some(m=>m.id===location.hash.slice(1))?location.hash.slice(1):'students',role:'admin',openTabIds:['students'],navOpen:false,menuKeyword:'',filters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},appliedFilters:{keyword:'',category:'',status:'',featured:'',system:'',createdDate:''},page:1,boardFilters:{keyword:'',status:''},appliedBoardFilters:{keyword:'',status:''},boardPage:1,department:'fashion',editor:false,editorMode:'edit',form:null,formInitial:'',formError:'',uploading:0,boardLogoError:'',smallForm:null,smallInitial:'',confirmation:null,preview:null,toast:null};
         },
         computed:{
             studentErrors(){return this.editor&&this.editorMode!=='detail'&&this.studentSubmitted&&this.form?Object.fromEntries(this.studentValidation(this.form).map(error=>[error.field,error.message])):{};},
-            boardErrors(){return this.smallForm?.type==='board'&&!this.smallForm.readOnly&&this.boardSubmitted?this.boardValidation(this.smallForm):{};},
+            boardErrors(){if(this.smallForm?.type!=='board'||this.smallForm.readOnly)return {};const errors=this.boardSubmitted?this.boardValidation(this.smallForm):{};if(this.boardLogoError)errors.logo=this.boardLogoError;return errors;},
             admissionsTitle(){return this.db.settings?.admissionsTitle||'录取院校：';},
             canEdit(){return this.ready&&this.storageReady&&!this.saving&&['admin','operator'].includes(this.role);},
             canDelete(){return this.ready&&this.storageReady&&!this.saving&&this.role==='admin';},
@@ -105,6 +105,7 @@
                 if(!school)errors.school='请选择录取院校';
                 else if(!this.offerSchoolGroups.some(group=>group.schools.includes(school)))errors.school='请从院校选项中选择';
                 else if(this.db.board.some(b=>b.id!==form.id&&b.school.trim().toLowerCase()===school.toLowerCase()))errors.school='此院校已在录取榜中，请修改原记录';
+                if(!String(form.logo||'').trim())errors.logo='请上传院校 Logo';
                 if(!['rate','offerCount'].includes(form.metricType))errors.metricType='请选择展示类型';
                 else if(form.metricType==='rate'&&(form.rate===''||form.rate==null||!Number.isFinite(rate)||rate<0||rate>100||Math.abs(rate*10-Math.round(rate*10))>1e-6))errors.rate='录取率须为 0—100，最多 1 位小数';
                 else if(form.metricType==='offerCount'&&(form.offerCount===''||form.offerCount==null||!Number.isSafeInteger(count)||count<0))errors.offerCount='Offer数量须为 0 或正整数';
@@ -246,7 +247,11 @@
             async upload(event,target,key){
                 const file=event.target.files?.[0];if(!file)return;
                 if(!this.guard()){event.target.value='';return;}
-                if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){this.formError='请选择 JPG、PNG 或 WebP 图片，单张不超过 5 MB';event.target.value='';return;}
+                if(this.uploading){event.target.value='';return;}
+                const boardLogo=target===this.smallForm&&target.type==='board'&&key==='logo',role=this.role;
+                const showError=message=>{if(boardLogo)this.boardLogoError=message;else this.formError=message;};
+                if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){showError('请选择 JPG、PNG 或 WebP 图片，单张不超过 5 MB');event.target.value='';return;}
+                if(boardLogo)this.boardLogoError='';
                 this.uploading++;
                 try{
                     const src=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});
@@ -260,15 +265,18 @@
                         if(compressed.length<src.length)optimized=compressed;
                         canvas.width=canvas.height=0;
                     }
-                    target[key]=optimized;this.formError='';
-                }catch{this.formError='图片读取失败，原图片已保留，请重新选择。';}finally{this.uploading--;event.target.value='';}
+                    if(this.role!==role||!['admin','operator'].includes(this.role)){showError('权限已变更，图片未替换，请重新操作。');return;}
+                    target[key]=optimized;if(boardLogo)this.boardLogoError='';else this.formError='';
+                }catch{showError('图片读取失败，原图片已保留，请重新选择。');}finally{this.uploading--;event.target.value='';}
             },
             editTitle(){if(!this.guard())return;this.formError='';this.smallForm={type:'title',title:'录取信息标题设置',admissionsTitle:this.admissionsTitle};},
             viewBoard(row){this.editBoard(row,true);},
-            editBoard(row,readOnly=false){if(!readOnly&&!this.guard())return;this.formError='';this.boardSubmitted=false;this.smallForm={type:'board',readOnly,title:readOnly?'录取榜院校详情':row?'修改录取榜院校':'新增录取榜院校',id:row?.id||'',school:row?.school||'',metricType:row?this.boardType(row):'rate',rate:row?.rate??'',offerCount:row?.offerCount??'',enabled:row?.enabled??true};},
-            closeSmallForm(){if(this.saving){this.notify('正在保存，请稍候',true);return;}if(this.smallForm&&JSON.stringify(this.smallForm)!==this.smallInitial){this.ask('放弃未保存的修改？','关闭后，本次配置输入不会生效。',()=>{this.smallForm=null;this.formError='';},{label:'放弃修改',danger:true});}else{this.smallForm=null;this.formError='';}},
+            editBoard(row,readOnly=false){if(!readOnly&&!this.guard())return;this.formError='';this.boardSubmitted=false;this.boardLogoError='';this.smallForm={type:'board',readOnly,title:readOnly?'录取榜院校详情':row?'修改录取榜院校':'新增录取榜院校',id:row?.id||'',school:row?.school||'',logo:row?.logo||'',metricType:row?this.boardType(row):'rate',rate:row?.rate??'',offerCount:row?.offerCount??'',enabled:row?.enabled??true};},
+            boardSchoolChanged(){if(!this.guard()||this.smallForm?.type!=='board'||this.smallForm.readOnly||this.uploading)return;this.smallForm.logo='';this.boardLogoError='';},
+            removeBoardLogo(){if(!this.guard()||this.smallForm?.type!=='board'||this.smallForm.readOnly||this.uploading)return;this.smallForm.logo='';this.boardLogoError='';},
+            closeSmallForm(){if(this.saving){this.notify('正在保存，请稍候',true);return;}if(this.uploading){this.notify('图片正在读取，请稍候',true);return;}if(this.smallForm&&JSON.stringify(this.smallForm)!==this.smallInitial){this.ask('放弃未保存的修改？','关闭后，本次配置输入不会生效。',()=>{this.smallForm=null;this.formError='';},{label:'放弃修改',danger:true});}else{this.smallForm=null;this.formError='';}},
             async saveSmallForm(){
-                if(!this.guard()||this.smallForm.readOnly)return;const f=clone(this.smallForm);this.formError='';
+                if(!this.guard()||this.uploading||this.smallForm.readOnly)return;const f=clone(this.smallForm);this.formError='';
                 if(f.revision!==undefined&&f.revision!==this.db.revision){this.formError='配置已被其他操作修改，请重新打开此表单核对最新内容。';return;}
                 if(f.type==='degree'){
                     this.degreeSubmitted=true;
@@ -289,10 +297,10 @@
                 }
                 if(f.type==='board'){
                     this.boardSubmitted=true;
-                    if(Object.keys(this.boardValidation(f)).length){this.$nextTick(()=>document.querySelector('.modal [aria-invalid="true"]')?.focus());return;}
+                    if(Object.keys(this.boardErrors).length){this.$nextTick(()=>document.querySelector('.modal [aria-invalid="true"]')?.focus());return;}
                     const school=f.school.trim(),metricType=f.metricType,value=this.boardValue(f);
                     if(f.id&&!this.db.board.some(row=>row.id===f.id)){this.formError='该院校记录已变更，请重新打开列表核对';return;}
-                    if(await this.commit(f.id?'修改录取榜':'新增录取榜',`${school} · ${this.boardTypeLabel(f)} ${this.formatBoardMetric(f)}`,db=>{const index=db.board.findIndex(b=>b.id===f.id),time=stamp(),row={...(index<0?{createdAt:time}:db.board[index]),id:f.id||id('board'),school,metricType,[metricType==='offerCount'?'offerCount':'rate']:value,enabled:f.enabled,updatedAt:time};if(index<0)db.board.push(row);else db.board[index]=row;})){this.smallForm=null;this.notify('录取榜已更新');}return;
+                    if(await this.commit(f.id?'修改录取榜':'新增录取榜',`${school} · ${this.boardTypeLabel(f)} ${this.formatBoardMetric(f)}`,db=>{const index=db.board.findIndex(b=>b.id===f.id),time=stamp(),row={...(index<0?{createdAt:time}:db.board[index]),id:f.id||id('board'),school,logo:f.logo,metricType,[metricType==='offerCount'?'offerCount':'rate']:value,enabled:f.enabled,updatedAt:time};if(index<0)db.board.push(row);else db.board[index]=row;})){this.smallForm=null;this.notify('录取榜已更新');}return;
                 }
             },
             toggleConfig(collection,row){if(!this.guard())return;const enabled=!row.enabled;if(collection!=='board'&&enabled){const s=this.studentById(row.studentId);if(!s||s.deletedAt||!s.enabled){this.notify('学员已停用或删除，请先恢复学员再启用展示',true);return;}}

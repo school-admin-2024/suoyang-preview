@@ -48,6 +48,9 @@
         });
         db.board.forEach((row, index) => {
             row.metricType ||= 'rate';
+            // Backfill only missing logo fields for known demo schools. Preserve
+            // uploads and explicitly empty values; never reset the stored records.
+            if (row.logo === undefined) row.logo = window.ADMIN_CASES_SEED.board.find(item => item.school === row.school)?.logo || '';
             const demoTime = '2026-10-' + String(20 + index % 9).padStart(2, '0') + ' 10:00:00';
             row.createdAt ||= row.updatedAt || demoTime;
             row.updatedAt ||= row.createdAt;

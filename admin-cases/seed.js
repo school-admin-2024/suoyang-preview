@@ -289,6 +289,7 @@ window.ADMIN_CASES_SEED = {
     {
       "id": "board-1",
       "school": "伦敦传媒学院",
+      "logo": "./assets/schools/lcc.png",
       "rate": 94,
       "enabled": true,
       "note": "参考图样例，统计口径待核实"
@@ -296,6 +297,7 @@ window.ADMIN_CASES_SEED = {
     {
       "id": "board-2",
       "school": "金斯顿大学",
+      "logo": "./assets/schools/kingston.png",
       "rate": 92,
       "enabled": true,
       "note": "参考图样例，统计口径待核实"
@@ -303,6 +305,7 @@ window.ADMIN_CASES_SEED = {
     {
       "id": "board-3",
       "school": "伦敦电影学院",
+      "logo": "./assets/schools/lfs.png",
       "rate": 87,
       "enabled": true,
       "note": "参考图样例，统计口径待核实"
@@ -310,6 +313,7 @@ window.ADMIN_CASES_SEED = {
     {
       "id": "board-4",
       "school": "爱丁堡大学",
+      "logo": "./assets/schools/edinburgh.png",
       "rate": 95,
       "enabled": true,
       "note": "参考图样例，统计口径待核实"
@@ -317,6 +321,7 @@ window.ADMIN_CASES_SEED = {
     {
       "id": "board-5",
       "school": "格拉斯哥艺术学院",
+      "logo": "./assets/schools/gsa.png",
       "rate": 93,
       "enabled": true,
       "note": "参考图样例，统计口径待核实"
